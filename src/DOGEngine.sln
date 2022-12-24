@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DOGEngine", "DOGEngine\DOGEngine.csproj", "{AE66116F-3EF7-454A-8ECC-919532227953}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DOGEngine.Test", "DOGEngine.Test\DOGEngine.Test.csproj", "{F951D451-01DE-42DE-B8D8-FAF965EED009}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AE66116F-3EF7-454A-8ECC-919532227953}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE66116F-3EF7-454A-8ECC-919532227953}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE66116F-3EF7-454A-8ECC-919532227953}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE66116F-3EF7-454A-8ECC-919532227953}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F951D451-01DE-42DE-B8D8-FAF965EED009}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F951D451-01DE-42DE-B8D8-FAF965EED009}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F951D451-01DE-42DE-B8D8-FAF965EED009}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F951D451-01DE-42DE-B8D8-FAF965EED009}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
