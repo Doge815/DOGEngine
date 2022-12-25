@@ -9,6 +9,7 @@
 
 # Blender files
 *.blend[0-9]
+*.mtl
 
 # User-specific files
 *.rsuser
