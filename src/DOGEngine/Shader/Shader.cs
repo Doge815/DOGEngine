@@ -86,6 +86,12 @@ public abstract class Shader : IShader
         GL.UniformMatrix4(uniformPos[name], true, ref data);
     }
 
+    public void SetVector3(string name, Vector3 data)
+    {
+        GL.UseProgram(Handle);
+        GL.Uniform3(uniformPos[name], data);
+    }
+
     public virtual void Use()
     {
         GL.UseProgram(Handle);

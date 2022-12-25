@@ -98,10 +98,8 @@ public class Cube : VertexRenderObject
             }
         },
     }, 36);
-    public Cube(TextureShader shader, Vector3? position = null, Vector3? rotation = null) : base(shader, position, rotation, data)
-        => Shader = shader;
+    public Cube(Shader.Shader shader, Vector3? position = null, Vector3? rotation = null) : base(shader, position, rotation, data) {}
 
-    public override TextureShader Shader { get; }
 
     public override void OnLoad()
     {

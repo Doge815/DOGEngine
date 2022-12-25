@@ -4,7 +4,7 @@ namespace DOGEngine.Shader;
 
 public class TextureShader : Shader, IVertexShader, ITextureCoordShader
 {
-    public TextureShader(Texture.Texture texture) : base("../../../../DOGEngine/Shader/Shaders/TextureShader.vert", "../../../../DOGEngine/Shader/Shaders/TextureShader.frag")
+    public TextureShader(Texture.Texture texture) : base("../../../../DOGEngine/Shader/Shaders/BaseShader.vert", "../../../../DOGEngine/Shader/Shaders/TextureShader.frag")
     {
         Texture = texture;
         SetInt("texture0", 0);
