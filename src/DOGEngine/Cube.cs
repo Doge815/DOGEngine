@@ -3,85 +3,111 @@ using OpenTK.Mathematics;
 
 namespace DOGEngine;
 
-public class Cube : RenderObject
+public class Cube : VertexRenderObject
 {
-    private static readonly float[] vertices =
+    private static readonly VertexDataBundle data = new VertexDataBundle(new Dictionary<Type, float[]>()
     {
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+        { typeof(VertexShaderAttribute), new[]
+            {
+                -0.5f, -0.5f, -0.5f, 
+                0.5f, -0.5f, -0.5f, 
+                0.5f, 0.5f, -0.5f, 
+                0.5f, 0.5f, -0.5f, 
+                -0.5f, 0.5f, -0.5f, 
+                -0.5f, -0.5f, -0.5f, 
 
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+                -0.5f, -0.5f, 0.5f, 
+                0.5f, -0.5f, 0.5f, 
+                0.5f, 0.5f, 0.5f, 
+                0.5f, 0.5f, 0.5f, 
+                -0.5f, 0.5f, 0.5f, 
+                -0.5f, -0.5f, 0.5f, 
 
-        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+                -0.5f, 0.5f, 0.5f, 
+                -0.5f, 0.5f, -0.5f, 
+                -0.5f, -0.5f, -0.5f, 
+                -0.5f, -0.5f, -0.5f, 
+                -0.5f, -0.5f, 0.5f, 
+                -0.5f, 0.5f, 0.5f, 
 
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+                0.5f, 0.5f, 0.5f, 
+                0.5f, 0.5f, -0.5f, 
+                0.5f, -0.5f, -0.5f, 
+                0.5f, -0.5f, -0.5f, 
+                0.5f, -0.5f, 0.5f, 
+                0.5f, 0.5f, 0.5f, 
 
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+                -0.5f, -0.5f, -0.5f, 
+                0.5f, -0.5f, -0.5f, 
+                0.5f, -0.5f, 0.5f, 
+                0.5f, -0.5f, 0.5f, 
+                -0.5f, -0.5f, 0.5f, 
+                -0.5f, -0.5f, -0.5f, 
 
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f
-    };
+                -0.5f, 0.5f, -0.5f, 
+                0.5f, 0.5f, -0.5f, 
+                0.5f, 0.5f, 0.5f, 
+                0.5f, 0.5f, 0.5f, 
+                -0.5f, 0.5f, 0.5f, 
+                -0.5f, 0.5f, -0.5f, 
+            }
+        },
+        { typeof(TextureCoordShaderAttribute), new[]
+            {
+                0.0f, 0.0f,
+                1.0f, 0.0f,
+                1.0f, 1.0f,
+                1.0f, 1.0f,
+                0.0f, 1.0f,
+                0.0f, 0.0f,
 
-    private int vertexArrayObj;
+                0.0f, 0.0f,
+                1.0f, 0.0f,
+                1.0f, 1.0f,
+                1.0f, 1.0f,
+                0.0f, 1.0f,
+                0.0f, 0.0f,
 
-    public Cube(TextureShader shader, Vector3? position = null, Vector3? rotation = null) : base(position, rotation)
+                1.0f, 0.0f,
+                1.0f, 1.0f,
+                0.0f, 1.0f,
+                0.0f, 1.0f,
+                0.0f, 0.0f,
+                1.0f, 0.0f,
+
+                1.0f, 0.0f,
+                1.0f, 1.0f,
+                0.0f, 1.0f,
+                0.0f, 1.0f,
+                0.0f, 0.0f,
+                1.0f, 0.0f,
+
+                0.0f, 1.0f,
+                1.0f, 1.0f,
+                1.0f, 0.0f,
+                1.0f, 0.0f,
+                0.0f, 0.0f,
+                0.0f, 1.0f,
+
+                0.0f, 1.0f,
+                1.0f, 1.0f,
+                1.0f, 0.0f,
+                1.0f, 0.0f,
+                0.0f, 0.0f,
+                0.0f, 1.0f
+            }
+        },
+    }, 36);
+    public Cube(TextureShader shader, Vector3? position = null, Vector3? rotation = null) : base(shader, position, rotation, data)
         => Shader = shader;
 
     public override TextureShader Shader { get; }
 
     public override void OnLoad()
     {
-        int vertexBufferObj = GL.GenBuffer();
-        GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferObj);
-        GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
-        vertexArrayObj = GL.GenVertexArray();
-        GL.BindVertexArray(vertexArrayObj);
-
-        interpretVertexDataFloat(Shader.Vertex, Shader.Stride);
-        interpretVertexDataFloat(Shader.TextureCoord, Shader.Stride);
+        base.OnLoad();
+        interpretVertexDataFloat(TextureShader.Vertex, Shader.Stride);
+        interpretVertexDataFloat(TextureShader.TextureCoord, Shader.Stride);
     }
 
-    public override void Draw(Matrix4 view, Matrix4 projection)
-    {
-        Shader.Use();
-        Matrix4 model = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(Rotation.X))
-                        * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(Rotation.Y))
-                        * Matrix4.CreateRotationZ(MathHelper.DegreesToRadians(Rotation.Z))
-                        * Matrix4.CreateTranslation(Position);
-
-        Shader.SetMatrix4("model", model);
-        Shader.SetMatrix4("view", view);
-        Shader.SetMatrix4("projection", projection);
-
-        GL.BindVertexArray(vertexArrayObj);
-        GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
-    }
 }

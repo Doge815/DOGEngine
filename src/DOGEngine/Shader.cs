@@ -5,6 +5,7 @@ namespace DOGEngine;
 
 public interface IShader
 {
+    public IShaderAttribute[] Attributes { get; }
     public int Handle { get; init; }
     public void Use();
 
@@ -29,7 +30,7 @@ public abstract class Shader : IShader
             GL.CompileShader(shader);
             GL.GetShader(shader, ShaderParameter.CompileStatus, out int success);
             if (success == 0)
-                throw new Exception(GL.GetShaderInfoLog(shader));
+                throw new ArgumentException(GL.GetShaderInfoLog(shader));
 
             return shader;
         }
@@ -63,6 +64,8 @@ public abstract class Shader : IShader
     }
 
     private Dictionary<string, int> uniformPos { get; }
+    public abstract IShaderAttribute[] Attributes { get; }  
+    public int Stride => Attributes.Sum(x => x.Size);
     public int Handle { get; init; }
 
     public void SetInt(string name, int data)
@@ -94,9 +97,42 @@ public abstract class Shader : IShader
     }
 }
 
-public struct ShaderAttribute
+public interface IShaderAttribute
 {
-    public string AttributeName { get; init; }
-    public int Offset { get; init; }
-    public int Size { get; init; }
+    int Size { get; }
+    int Offset { get; }
+    string AttributeName { get; }
+}
+
+public sealed class VertexShaderAttribute : IShaderAttribute
+{
+    public int Size => 3;
+    public int Offset { get; }
+    public string AttributeName { get; }
+
+    public VertexShaderAttribute(int offset, string attributeName)
+    {
+        Offset = offset;
+        AttributeName = attributeName;
+    }
+}
+public interface IVertexShader
+{
+    static abstract VertexShaderAttribute Vertex { get; }
+}
+public sealed class TextureCoordShaderAttribute : IShaderAttribute
+{
+    public int Size => 2;
+    public int Offset { get; }
+    public string AttributeName { get; }
+
+    public TextureCoordShaderAttribute(int offset, string attributeName)
+    {
+        Offset = offset;
+        AttributeName = attributeName;
+    }
+}
+public interface ITextureCoordShader
+{
+    static abstract TextureCoordShaderAttribute TextureCoord{ get; }
 }
