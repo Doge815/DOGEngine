@@ -22,7 +22,7 @@ public abstract class RenderObject
 
     protected void interpretVertexData(string attribute, int size, VertexAttribPointerType type, int stride, int offset)
     {
-        int index = Shader!.GetAttributeLocation(attribute);
+        int index = Shader.GetAttributeLocation(attribute);
         if (index != -1)
         {
             GL.EnableVertexAttribArray(index);

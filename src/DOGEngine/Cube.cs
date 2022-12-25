@@ -53,7 +53,7 @@ public class Cube : RenderObject
     private int vertexArrayObj;
 
     public Cube(TextureShader shader, Vector3? position = null, Vector3? rotation = null) : base(position, rotation)
-        => Shader = shader; 
+        => Shader = shader;
 
     public override TextureShader Shader { get; }
 
