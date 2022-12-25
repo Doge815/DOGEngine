@@ -7,6 +7,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+# Blender files
+*.blend[0-9]
+
 # User-specific files
 *.rsuser
 *.suo
@@ -78,7 +81,7 @@ StyleCopReport.xml
 *_h.h
 *.ilk
 *.meta
-*.obj
+# *.obj
 *.iobj
 *.pch
 *.pdb
