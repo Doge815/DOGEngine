@@ -1,8 +1,7 @@
 using OpenTK.Mathematics;
-using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-namespace DOGEngine;
+namespace DOGEngine.Camera;
 
 public class PlayerController : Camera
 {

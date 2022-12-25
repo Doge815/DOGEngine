@@ -1,18 +1,17 @@
 using OpenTK.Graphics.OpenGL4;
 
-namespace DOGEngine;
+namespace DOGEngine.Shader;
 
 public class TextureShader : Shader, IVertexShader, ITextureCoordShader
 {
-    public TextureShader(Texture texture) : base("../../../../DOGEngine/Shaders/TextureShader.vert", "../../../../DOGEngine/Shaders/TextureShader.frag")
+    public TextureShader(Texture.Texture texture) : base("../../../../DOGEngine/Shader/Shaders/TextureShader.vert", "../../../../DOGEngine/Shader/Shaders/TextureShader.frag")
     {
         Texture = texture;
         SetInt("texture0", 0);
     }
 
-    public Texture Texture { get; }
+    public Texture.Texture Texture { get; }
 
-    public int Stride => Attributes.Sum(x => x.Size);
     public static VertexShaderAttribute Vertex { get; } = new(0, "aPosition");
     public static TextureCoordShaderAttribute TextureCoord { get; } = new(3, "aTexCoord");
 

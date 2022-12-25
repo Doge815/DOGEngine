@@ -1,7 +1,7 @@
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
-namespace DOGEngine;
+namespace DOGEngine.Shader;
 
 public interface IShader
 {

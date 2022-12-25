@@ -1,3 +1,6 @@
+using DOGEngine.Camera;
+using DOGEngine.RenderObjects;
+using DOGEngine.Shader;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
@@ -32,8 +35,8 @@ public class TestWindow : GameWindow
         base.OnLoad();
         GL.ClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 
-        var wallTexture = new Texture("../../../../DOGEngine/Textures/wall.jpg");
-        var woodTexture = new Texture("../../../../DOGEngine/Textures/wood.jpg");
+        var wallTexture = new Texture.Texture("../../../../DOGEngine/Texture/Textures/wall.jpg");
+        var woodTexture = new Texture.Texture("../../../../DOGEngine/Texture/Textures/wood.jpg");
 
         var shader1 = new TextureShader(wallTexture);
         var shader2 = new TextureShader(woodTexture);

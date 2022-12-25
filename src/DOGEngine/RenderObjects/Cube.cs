@@ -1,7 +1,7 @@
-using OpenTK.Graphics.OpenGL4;
+using DOGEngine.Shader;
 using OpenTK.Mathematics;
 
-namespace DOGEngine;
+namespace DOGEngine.RenderObjects;
 
 public class Cube : VertexRenderObject
 {

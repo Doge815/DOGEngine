@@ -1,7 +1,7 @@
 using OpenTK.Graphics.OpenGL4;
 using StbImageSharp;
 
-namespace DOGEngine;
+namespace DOGEngine.Texture;
 
 public class Texture
 {

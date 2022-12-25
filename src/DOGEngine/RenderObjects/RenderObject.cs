@@ -1,21 +1,22 @@
+using DOGEngine.Shader;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
-namespace DOGEngine;
+namespace DOGEngine.RenderObjects;
 
 public abstract class RenderObject
 {
     public Vector3 Position { get; set; }
     public Vector3 Rotation { get; set; }
 
-    protected RenderObject(Shader shader, Vector3? position, Vector3? rotation)
+    protected RenderObject(Shader.Shader shader, Vector3? position, Vector3? rotation)
     {
         Shader = shader;
         Position = position ?? Vector3.Zero;
         Rotation = rotation ?? Vector3.Zero;
     }
 
-    public virtual Shader Shader { get; }
+    public virtual Shader.Shader Shader { get; }
 
     public abstract void OnLoad();
     public abstract void Draw(Matrix4 view, Matrix4 projection);
@@ -68,7 +69,7 @@ public abstract class VertexRenderObject : RenderObject
         GL.DrawArrays(PrimitiveType.Triangles, 0, triangles);
     }
 
-    protected VertexRenderObject(Shader shader, Vector3? position, Vector3? rotation, VertexDataBundle? data) : base(shader, position, rotation)
+    protected VertexRenderObject(Shader.Shader shader, Vector3? position, Vector3? rotation, VertexDataBundle? data) : base(shader, position, rotation)
     {
         vertices = data?.CreateVertices(shader) ?? Array.Empty<float>();
         triangles = data?.Rows ?? 0;
@@ -79,7 +80,7 @@ public readonly struct VertexDataBundle
 {
     private Dictionary<Type, float[]> Data { get; }
     public int Rows { get; }
-    public float[] CreateVertices(Shader shader)
+    public float[] CreateVertices(Shader.Shader shader)
     {
         int columns = 0;
         foreach (IShaderAttribute attribute in shader.Attributes)

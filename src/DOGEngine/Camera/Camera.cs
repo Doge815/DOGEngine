@@ -1,6 +1,6 @@
 using OpenTK.Mathematics;
 
-namespace DOGEngine;
+namespace DOGEngine.Camera;
 
 public class Camera
 {
