@@ -52,6 +52,9 @@ public abstract class VertexRenderObject : RenderObject
         GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
         vertexArrayObj = GL.GenVertexArray();
         GL.BindVertexArray(vertexArrayObj);
+
+        foreach (IShaderAttribute attribute in Shader.Attributes)
+            interpretVertexDataFloat(attribute, Shader.Stride);
     }
     public override void Draw(Matrix4 view, Matrix4 projection)
     {

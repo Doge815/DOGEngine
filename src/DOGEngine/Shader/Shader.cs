@@ -126,6 +126,22 @@ public interface IVertexShader
 {
     static abstract VertexShaderAttribute Vertex { get; }
 }
+public sealed class NormalShaderAttribute : IShaderAttribute
+{
+    public int Size => 3;
+    public int Offset { get; }
+    public string AttributeName { get; }
+
+    public NormalShaderAttribute(int offset, string attributeName)
+    {
+        Offset = offset;
+        AttributeName = attributeName;
+    }
+}
+public interface INormalShader
+{
+    static abstract NormalShaderAttribute Vertex { get; }
+}
 public sealed class TextureCoordShaderAttribute : IShaderAttribute
 {
     public int Size => 2;

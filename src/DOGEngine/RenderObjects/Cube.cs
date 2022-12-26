@@ -99,13 +99,4 @@ public class Cube : VertexRenderObject
         },
     }, 36);
     public Cube(Shader.Shader shader, Vector3? position = null, Vector3? rotation = null) : base(shader, position, rotation, data) {}
-
-
-    public override void OnLoad()
-    {
-        base.OnLoad();
-        interpretVertexDataFloat(TextureShader.Vertex, Shader.Stride);
-        interpretVertexDataFloat(TextureShader.TextureCoord, Shader.Stride);
-    }
-
 }

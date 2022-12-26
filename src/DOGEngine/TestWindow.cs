@@ -11,9 +11,10 @@ namespace DOGEngine;
 
 public class TestWindow : GameWindow
 {
-    private Cube? cube1;
-    private Cube? cube2;
-    private Cube? cube3;
+    private RenderObject? cube1;
+    private RenderObject? cube2;
+    private RenderObject? cube3;
+    private RenderObject? pawn;
     private readonly PlayerController camera;
 
     public TestWindow(int width, int height, string title) : base(GameWindowSettings.Default,
@@ -25,9 +26,9 @@ public class TestWindow : GameWindow
         base.OnUpdateFrame(args);
 
         if (KeyboardState.IsKeyDown(Keys.Escape))
-        {
             Close();
-        }
+        if(IsFocused)
+            camera.Update(KeyboardState, MouseState, (float)args.Time);
     }
 
     protected override void OnLoad()
@@ -38,16 +39,18 @@ public class TestWindow : GameWindow
 
         var wallTexture = new Texture.Texture("../../../../DOGEngine/Texture/Textures/wall.jpg");
         var woodTexture = new Texture.Texture("../../../../DOGEngine/Texture/Textures/wood.jpg");
+        var carpetTexture = new Texture.Texture("../../../../DOGEngine/Texture/Textures/carpet.jpg");
 
         var shader1 = new TextureShader(wallTexture);
         var shader2 = new TextureShader(woodTexture);
-        var shader3 = new PlainColorShader(new Vector3(1, 0, 0));
+        var shader3 = new TextureShader(carpetTexture);
+        var shader4 = new PlainColorShader(new Vector3(1, 0, 0));
 
         cube1 = new Cube(shader1);
         cube1.OnLoad();
         cube1.Position = new Vector3(-1, -1, -5);
 
-        cube2 = new Cube(shader2);
+        cube2 = new Cube(shader4);
         cube2.OnLoad();
         cube2.Position = new Vector3(1, 1, -5);
         
@@ -55,6 +58,9 @@ public class TestWindow : GameWindow
         cube3.OnLoad();
         cube3.Position = new Vector3(0, 4, -5);
 
+        pawn = new ParsedModel( "../../../../DOGEngine/RenderObjects/Models/SmoothPawn.obj", shader2);
+        pawn.OnLoad();
+        pawn.Position = new Vector3(0, 0, -7);
     }
 
     protected override void OnRenderFrame(FrameEventArgs args)
@@ -62,7 +68,6 @@ public class TestWindow : GameWindow
         base.OnRenderFrame(args);
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-        camera.Update(KeyboardState, MouseState, (float)args.Time);
         
         var view = camera.ViewMatrix;
         var projection = camera.ProjectionMatrix;
@@ -70,6 +75,7 @@ public class TestWindow : GameWindow
         cube1!.Draw(view, projection);
         cube2!.Draw(view, projection);
         cube3!.Draw(view, projection);
+        pawn!.Draw(view, projection);
 
         SwapBuffers();
     }
