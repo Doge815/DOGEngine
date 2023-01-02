@@ -7,13 +7,17 @@ namespace DOGEngine.RenderObjects;
 public abstract class RenderObject
 {
     public Vector3 Position { get; set; }
-    public Vector3 Rotation { get; set; }
+    public Vector3 Orientation { get; set; }
+    public Vector3 Scale { get; set; }
+    public Vector3 OrientationOffset { get; set; }
 
-    protected RenderObject(Shader.Shader shader, Vector3? position, Vector3? rotation)
+    protected RenderObject(Shader.Shader shader, Vector3? position, Vector3? orientation, Vector3? scale, Vector3? orientationOffset)
     {
         Shader = shader;
         Position = position ?? Vector3.Zero;
-        Rotation = rotation ?? Vector3.Zero;
+        Orientation = orientation ?? Vector3.Zero;
+        Scale = scale ?? Vector3.One;
+        OrientationOffset = orientationOffset ?? Vector3.Zero;
     }
 
     public virtual Shader.Shader Shader { get; }
@@ -59,9 +63,12 @@ public abstract class VertexRenderObject : RenderObject
     public override void Draw(Matrix4 view, Matrix4 projection)
     {
         Shader.Use();
-        Matrix4 model = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(Rotation.X))
-                        * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(Rotation.Y))
-                        * Matrix4.CreateRotationZ(MathHelper.DegreesToRadians(Rotation.Z))
+        Matrix4 model = Matrix4.CreateScale(Scale)
+                        * Matrix4.CreateTranslation(OrientationOffset)
+                        * Matrix4.CreateRotationX(MathHelper.DegreesToRadians(Orientation.X))
+                        * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(Orientation.Y))
+                        * Matrix4.CreateRotationZ(MathHelper.DegreesToRadians(Orientation.Z))
+                        * Matrix4.CreateTranslation(-OrientationOffset)
                         * Matrix4.CreateTranslation(Position);
 
         Shader.SetMatrix4("model", model);
@@ -72,7 +79,7 @@ public abstract class VertexRenderObject : RenderObject
         GL.DrawArrays(PrimitiveType.Triangles, 0, triangles);
     }
 
-    protected VertexRenderObject(Shader.Shader shader, Vector3? position, Vector3? rotation, VertexDataBundle? data) : base(shader, position, rotation)
+    protected VertexRenderObject(Shader.Shader shader, Vector3? position, Vector3? orientation, Vector3? scale, Vector3? orientationOffset, VertexDataBundle? data) : base(shader, position, orientation, scale, orientationOffset)
     {
         vertices = data?.CreateVertices(shader) ?? Array.Empty<float>();
         triangles = data?.Rows ?? 0;

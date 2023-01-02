@@ -30,6 +30,8 @@ public class TestWindow : GameWindow
             Close();
         if(IsFocused)
             camera.Update(KeyboardState, MouseState, (float)args.Time);
+
+        cube3!.Orientation = cube3.Orientation with { Y = cube3.Orientation.Y + 60 * (float)args.Time };
     }
 
     protected override void OnLoad()
@@ -57,21 +59,17 @@ public class TestWindow : GameWindow
         var shader3 = new TextureShader(carpetTexture);
         var shader4 = new PlainColorShader(new Vector3(1, 0, 0));
 
-        cube1 = new Cube(shader1);
+        cube1 = new Cube(shader1, new Vector3(-1, -1, -5));
         cube1.OnLoad();
-        cube1.Position = new Vector3(-1, -1, -5);
 
-        cube2 = new Cube(shader4);
+        cube2 = new Cube(shader4, new Vector3(1, 1, -5));
         cube2.OnLoad();
-        cube2.Position = new Vector3(1, 1, -5);
         
-        cube3 = new Cube(shader3);
+        cube3 = new Cube(shader3,new Vector3(0, 4, -5), new Vector3(0, 1, 0), new Vector3(2, 3, 4), new Vector3(1, 0, 1));
         cube3.OnLoad();
-        cube3.Position = new Vector3(0, 4, -5);
 
-        pawn = new ParsedModel( "../../../../DOGEngine/RenderObjects/Models/Pawn.obj", shader2);
+        pawn = new ParsedModel( "../../../../DOGEngine/RenderObjects/Models/Pawn.obj", shader2, new Vector3(0, 0, -7));
         pawn.OnLoad();
-        pawn.Position = new Vector3(0, 0, -7);
         
     }
 

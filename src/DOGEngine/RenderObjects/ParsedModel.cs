@@ -6,7 +6,7 @@ namespace DOGEngine.RenderObjects;
 
 public class ParsedModel : VertexRenderObject
 {
-    public ParsedModel(string filePath, Shader.Shader shader, Vector3? position = null, Vector3? rotation = null) : base(shader, position, rotation, ParseFile(filePath)) {}
+    public ParsedModel(string filePath, Shader.Shader shader, Vector3? position = null, Vector3? orientation = null, Vector3? scale = null, Vector3? orientationOffset = null) : base(shader, position, orientation, scale, orientationOffset, ParseFile(filePath)) {}
 
     private static VertexDataBundle ParseFile(string filePath)
     {

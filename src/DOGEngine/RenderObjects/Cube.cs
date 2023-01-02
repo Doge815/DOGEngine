@@ -98,5 +98,5 @@ public class Cube : VertexRenderObject
             }
         },
     }, 36);
-    public Cube(Shader.Shader shader, Vector3? position = null, Vector3? rotation = null) : base(shader, position, rotation, data) {}
+    public Cube(Shader.Shader shader, Vector3? position = null, Vector3? orientation = null, Vector3? scale = null, Vector3? orientationOffset = null) : base(shader, position, orientation, scale, orientationOffset, data) {}
 }
