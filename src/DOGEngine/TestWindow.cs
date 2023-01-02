@@ -11,6 +11,7 @@ namespace DOGEngine;
 
 public class TestWindow : GameWindow
 {
+    private Skybox skybox;
     private RenderObject? cube1;
     private RenderObject? cube2;
     private RenderObject? cube3;
@@ -33,9 +34,19 @@ public class TestWindow : GameWindow
 
     protected override void OnLoad()
     {
-        GL.Enable(EnableCap.DepthTest);
         base.OnLoad();
+        GL.Enable(EnableCap.DepthTest);
         GL.ClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+
+        skybox = new Skybox(new string[]
+        {
+            "../../../../DOGEngine/Texture/Skybox/right.jpg",
+            "../../../../DOGEngine/Texture/Skybox/left.jpg",
+            "../../../../DOGEngine/Texture/Skybox/top.jpg",
+            "../../../../DOGEngine/Texture/Skybox/bottom.jpg",
+            "../../../../DOGEngine/Texture/Skybox/front.jpg",
+            "../../../../DOGEngine/Texture/Skybox/back.jpg",
+        });
 
         var wallTexture = new Texture.Texture("../../../../DOGEngine/Texture/Textures/wall.jpg");
         var woodTexture = new Texture.Texture("../../../../DOGEngine/Texture/Textures/wood.jpg");
@@ -61,6 +72,7 @@ public class TestWindow : GameWindow
         pawn = new ParsedModel( "../../../../DOGEngine/RenderObjects/Models/SmoothPawn.obj", shader2);
         pawn.OnLoad();
         pawn.Position = new Vector3(0, 0, -7);
+        
     }
 
     protected override void OnRenderFrame(FrameEventArgs args)
@@ -71,6 +83,8 @@ public class TestWindow : GameWindow
         
         var view = camera.ViewMatrix;
         var projection = camera.ProjectionMatrix;
+        
+        skybox.Draw(view, projection);
 
         cube1!.Draw(view, projection);
         cube2!.Draw(view, projection);
