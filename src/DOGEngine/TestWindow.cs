@@ -69,7 +69,7 @@ public class TestWindow : GameWindow
         cube3.OnLoad();
         cube3.Position = new Vector3(0, 4, -5);
 
-        pawn = new ParsedModel( "../../../../DOGEngine/RenderObjects/Models/SmoothPawn.obj", shader2);
+        pawn = new ParsedModel( "../../../../DOGEngine/RenderObjects/Models/Pawn.obj", shader2);
         pawn.OnLoad();
         pawn.Position = new Vector3(0, 0, -7);
         
