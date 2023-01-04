@@ -12,10 +12,10 @@ namespace DOGEngine;
 public class TestWindow : GameWindow
 {
     private Skybox skybox;
-    private RenderObject? cube1;
-    private RenderObject? cube2;
-    private RenderObject? cube3;
-    private RenderObject? pawn;
+    private OldObj? cube1;
+    private OldObj? cube2;
+    private OldObj? cube3;
+    private OldObj? pawn;
     private readonly PlayerController camera;
 
     public TestWindow(int width, int height, string title) : base(GameWindowSettings.Default,
@@ -60,16 +60,9 @@ public class TestWindow : GameWindow
         var shader4 = new PlainColorShader(new Vector3(1, 0, 0));
 
         cube1 = new Cube(shader1, new Vector3(-1, -1, -5));
-        cube1.OnLoad();
-
         cube2 = new Cube(shader4, new Vector3(1, 1, -5));
-        cube2.OnLoad();
-        
         cube3 = new Cube(shader3,new Vector3(0, 4, -5), new Vector3(0, 1, 0), new Vector3(2, 3, 4), new Vector3(1, 0, 1));
-        cube3.OnLoad();
-
         pawn = new ParsedModel( "../../../../DOGEngine/RenderObjects/Models/Pawn.obj", shader2, new Vector3(0, 0, -7));
-        pawn.OnLoad();
         
     }
 

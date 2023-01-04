@@ -4,14 +4,14 @@ using OpenTK.Mathematics;
 
 namespace DOGEngine.RenderObjects;
 
-public abstract class RenderObject
+public abstract class OldObj
 {
     public Vector3 Position { get; set; }
     public Vector3 Orientation { get; set; }
     public Vector3 Scale { get; set; }
     public Vector3 OrientationOffset { get; set; }
 
-    protected RenderObject(Shader.Shader shader, Vector3? position, Vector3? orientation, Vector3? scale, Vector3? orientationOffset)
+    protected OldObj(Shader.Shader shader, Vector3? position, Vector3? orientation, Vector3? scale, Vector3? orientationOffset)
     {
         Shader = shader;
         Position = position ?? Vector3.Zero;
@@ -20,9 +20,8 @@ public abstract class RenderObject
         OrientationOffset = orientationOffset ?? Vector3.Zero;
     }
 
-    public virtual Shader.Shader Shader { get; }
+    public Shader.Shader Shader { get; }
 
-    public abstract void OnLoad();
     public abstract void Draw(Matrix4 view, Matrix4 projection);
 
     protected void interpretVertexData(string attribute, int size, VertexAttribPointerType type, int stride, int offset)
@@ -31,7 +30,7 @@ public abstract class RenderObject
         if (index != -1)
         {
             GL.EnableVertexAttribArray(index);
-            GL.VertexAttribPointer(index, size, VertexAttribPointerType.Float, false, stride, offset);
+            GL.VertexAttribPointer(index, size, type, false, stride, offset);
         }
     }
 
@@ -43,24 +42,12 @@ public abstract class RenderObject
     }
 }
 
-public abstract class VertexRenderObject : RenderObject
+public abstract class VertexRenderObject : OldObj
 {
-    private int vertexArrayObj;
-    private readonly float[] vertices;
+    private readonly int vertexArrayObj;
     private readonly int triangles;
     
-    public override void OnLoad()
-    {
-        int vertexBufferObj = GL.GenBuffer();
-        GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferObj);
-        GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
-        vertexArrayObj = GL.GenVertexArray();
-        GL.BindVertexArray(vertexArrayObj);
-
-        foreach (IShaderAttribute attribute in Shader.Attributes)
-            interpretVertexDataFloat(attribute, Shader.Stride);
-    }
-    public override void Draw(Matrix4 view, Matrix4 projection)
+    public sealed override void Draw(Matrix4 view, Matrix4 projection)
     {
         Shader.Use();
         Matrix4 model = Matrix4.CreateScale(Scale)
@@ -81,8 +68,17 @@ public abstract class VertexRenderObject : RenderObject
 
     protected VertexRenderObject(Shader.Shader shader, Vector3? position, Vector3? orientation, Vector3? scale, Vector3? orientationOffset, VertexDataBundle? data) : base(shader, position, orientation, scale, orientationOffset)
     {
-        vertices = data?.CreateVertices(shader) ?? Array.Empty<float>();
+        var vertices = data?.CreateVertices(shader) ?? Array.Empty<float>();
         triangles = data?.Rows ?? 0;
+        
+        int vertexBufferObj = GL.GenBuffer();
+        GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferObj);
+        GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
+        vertexArrayObj = GL.GenVertexArray();
+        GL.BindVertexArray(vertexArrayObj);
+
+        foreach (IShaderAttribute attribute in Shader.Attributes)
+            interpretVertexDataFloat(attribute, Shader.Stride);
     }
 }
 
