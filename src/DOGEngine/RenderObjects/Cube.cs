@@ -5,7 +5,7 @@ namespace DOGEngine.RenderObjects;
 
 public class Cube : VertexRenderObject
 {
-    private static readonly VertexDataBundle data = new VertexDataBundle(new Dictionary<Type, float[]>()
+    public static readonly VertexDataBundle data = new VertexDataBundle(new Dictionary<Type, float[]>()
     {
         { typeof(VertexShaderAttribute), new[]
             {
