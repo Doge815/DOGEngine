@@ -5,6 +5,42 @@ using OpenTK.Mathematics;
 using StbImageSharp;
 
 namespace DOGEngine.RenderObjects;
+public readonly struct VertexDataBundle
+{
+    private Dictionary<Type, float[]> Data { get; }
+    public int Rows { get; }
+    public float[] CreateVertices(Shader.Shader shader)
+    {
+        int columns = 0;
+        foreach (IShaderAttribute attribute in shader.Attributes)
+        {
+            columns += attribute.Size;
+        }
+
+        float[] verts = new float[columns * Rows];
+        foreach (IShaderAttribute attribute in shader.Attributes)
+        {
+            for (int i = 0; i < Rows; i++)
+            {
+                for (int j = 0; j <  attribute.Size; j++)
+                {
+                    int writePosition = i * columns + j + attribute.Offset;
+                    if (Data.TryGetValue(attribute.GetType(), out var attributeData))
+                        verts[writePosition] = attributeData[i * attribute.Size + j];
+                    else
+                        verts[writePosition] = 0;
+                }
+            }
+        }
+        return verts;
+    }
+
+    public VertexDataBundle(Dictionary<Type, float[]> data, int rows)
+    {
+        Data = data;
+        Rows = rows;
+    }
+}
 
 public interface IPostInitializedGameObject
 {
@@ -41,6 +77,16 @@ public class GameObject
             yield return childComponent;
 
         if (GetType() == typeof(T)) yield return this as T ?? throw new SystemException("Oof");
+    }
+
+    public virtual IEnumerable<GameObject> GetAllWithName(string name)
+    {
+        
+        foreach (GameObject child in Children)
+        foreach (var childComponent in child.GetAllWithName(name))
+            yield return childComponent;
+
+        if (TryGetComponent(out Name? objName) && objName!.ObjName == name) yield return this;
     }
 
     public void AddComponent(GameObject gameObject)
@@ -81,27 +127,8 @@ public class GameObject
         }
         foreach (var child in newChildren)
         {
-            child.Parent = this;
-            AddComponent(child);
-        }
-    }
-}
-
-public class Scene : GameObject
-{
-    public Scene() 
-    {
-        AddComponent(new GameObjectCollection(this));
-    }
-    public Scene(params GameObject[] newChildren)
-    {
-        GameObjectCollection collection = new GameObjectCollection(this);
-        AddComponent(collection);
-        foreach (var child in newChildren)
-        {
-            child.Parent = collection;
-            collection.AddComponent(child);
-            if(child is IPostInitializedGameObject initialize) initialize.Initialize();
+            if(child is IPostInitializedGameObject initialize)
+                initialize.Initialize();
         }
     }
 }
@@ -111,9 +138,17 @@ public class GameObjectCollection : GameObject
     private readonly List<GameObject> collection;
     public IReadOnlyCollection<GameObject> Collection => collection.AsReadOnly();
 
-    public GameObjectCollection(GameObject parent) : base(parent)
+    public void CollectionAddComponent(GameObject child) => collection.Add(child);
+    public GameObjectCollection(params GameObject[] newChildren)
     {
         collection = new List<GameObject>();
+        foreach (var child in newChildren)
+        {
+            child.Parent = this;
+            CollectionAddComponent(child);
+            if(child is IPostInitializedGameObject initialize)
+                initialize.Initialize();
+        }
     }
 
     public override IEnumerable<T> GetAllInChildren<T>()
@@ -122,11 +157,18 @@ public class GameObjectCollection : GameObject
             yield return child;
 
         foreach (GameObject child in collection)
-            foreach (T childComponent in child.GetAllInChildren<T>())
-                yield return childComponent;
+        foreach (T childComponent in child.GetAllInChildren<T>())
+            yield return childComponent;
     }
+    public override IEnumerable<GameObject> GetAllWithName(string name)
+    {
+        foreach (var child in base.GetAllWithName(name))
+            yield return child;
 
-    public void AddGameObject(GameObject gameObject) => collection.Add(gameObject);
+        foreach (GameObject child in collection)
+        foreach (GameObject childComponent in child.GetAllWithName(name))
+            yield return childComponent;
+    }
 }
 
 public class Transform : GameObject
@@ -146,7 +188,7 @@ public class Transform : GameObject
     }
 }
 
-public class Mesh : GameObject, IPostInitializedGameObject
+public partial class Mesh : GameObject, IPostInitializedGameObject
 {
     private int VAO; 
     private int triangles;
@@ -161,7 +203,7 @@ public class Mesh : GameObject, IPostInitializedGameObject
     public void Initialize()
     {
         Shader.Shader shader = Parent.GetComponent<Shading>().Shader;
-        var vertices = tempData.CreateVertices(shader) ?? Array.Empty<float>();
+        var vertices = tempData.CreateVertices(shader);
         triangles = tempData.Rows;
         
         int vertexBufferObj = GL.GenBuffer();
@@ -341,4 +383,11 @@ public class GameObjSkybox : GameObject //Todo: Split
 
         GL.DepthMask(true);
     }
+}
+
+public class Name : GameObject
+{
+    public string ObjName { get; }
+
+    public Name(string objName) => ObjName = objName;
 }

@@ -1,14 +1,10 @@
-using System.Runtime.Intrinsics.X86;
 using DOGEngine.Shader;
-using OpenTK.Mathematics;
 
 namespace DOGEngine.RenderObjects;
 
-public class ParsedModel : VertexRenderObject
+public partial class Mesh
 {
-    public ParsedModel(string filePath, Shader.Shader shader, Vector3? position = null, Vector3? orientation = null, Vector3? scale = null, Vector3? orientationOffset = null) : base(shader, position, orientation, scale, orientationOffset, ParseFile(filePath)) {}
-
-    private static VertexDataBundle ParseFile(string filePath)
+    public static VertexDataBundle FromFile(string filePath)
     {
         List<(float, float, float)> vertices = new List<(float, float, float)>();
         List<(float, float, float)> normals= new List<(float, float, float)>();
@@ -151,4 +147,97 @@ public class ParsedModel : VertexRenderObject
             data.Add(typeof(NormalShaderAttribute), norms);
         return new VertexDataBundle(data, faces.Count * 3);
     }
+    public static readonly VertexDataBundle Cube = new VertexDataBundle(new Dictionary<Type, float[]>()
+    {
+        { typeof(VertexShaderAttribute), new[]
+            {
+                -0.5f, -0.5f, -0.5f, 
+                0.5f, -0.5f, -0.5f, 
+                0.5f, 0.5f, -0.5f, 
+                0.5f, 0.5f, -0.5f, 
+                -0.5f, 0.5f, -0.5f, 
+                -0.5f, -0.5f, -0.5f, 
+
+                -0.5f, -0.5f, 0.5f, 
+                0.5f, -0.5f, 0.5f, 
+                0.5f, 0.5f, 0.5f, 
+                0.5f, 0.5f, 0.5f, 
+                -0.5f, 0.5f, 0.5f, 
+                -0.5f, -0.5f, 0.5f, 
+
+                -0.5f, 0.5f, 0.5f, 
+                -0.5f, 0.5f, -0.5f, 
+                -0.5f, -0.5f, -0.5f, 
+                -0.5f, -0.5f, -0.5f, 
+                -0.5f, -0.5f, 0.5f, 
+                -0.5f, 0.5f, 0.5f, 
+
+                0.5f, 0.5f, 0.5f, 
+                0.5f, 0.5f, -0.5f, 
+                0.5f, -0.5f, -0.5f, 
+                0.5f, -0.5f, -0.5f, 
+                0.5f, -0.5f, 0.5f, 
+                0.5f, 0.5f, 0.5f, 
+
+                -0.5f, -0.5f, -0.5f, 
+                0.5f, -0.5f, -0.5f, 
+                0.5f, -0.5f, 0.5f, 
+                0.5f, -0.5f, 0.5f, 
+                -0.5f, -0.5f, 0.5f, 
+                -0.5f, -0.5f, -0.5f, 
+
+                -0.5f, 0.5f, -0.5f, 
+                0.5f, 0.5f, -0.5f, 
+                0.5f, 0.5f, 0.5f, 
+                0.5f, 0.5f, 0.5f, 
+                -0.5f, 0.5f, 0.5f, 
+                -0.5f, 0.5f, -0.5f, 
+            }
+        },
+        { typeof(TextureCoordShaderAttribute), new[]
+            {
+                0.0f, 0.0f,
+                1.0f, 0.0f,
+                1.0f, 1.0f,
+                1.0f, 1.0f,
+                0.0f, 1.0f,
+                0.0f, 0.0f,
+
+                0.0f, 0.0f,
+                1.0f, 0.0f,
+                1.0f, 1.0f,
+                1.0f, 1.0f,
+                0.0f, 1.0f,
+                0.0f, 0.0f,
+
+                1.0f, 0.0f,
+                1.0f, 1.0f,
+                0.0f, 1.0f,
+                0.0f, 1.0f,
+                0.0f, 0.0f,
+                1.0f, 0.0f,
+
+                1.0f, 0.0f,
+                1.0f, 1.0f,
+                0.0f, 1.0f,
+                0.0f, 1.0f,
+                0.0f, 0.0f,
+                1.0f, 0.0f,
+
+                0.0f, 1.0f,
+                1.0f, 1.0f,
+                1.0f, 0.0f,
+                1.0f, 0.0f,
+                0.0f, 0.0f,
+                0.0f, 1.0f,
+
+                0.0f, 1.0f,
+                1.0f, 1.0f,
+                1.0f, 0.0f,
+                1.0f, 0.0f,
+                0.0f, 0.0f,
+                0.0f, 1.0f
+            }
+        },
+    }, 36);
 }

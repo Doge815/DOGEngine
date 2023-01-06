@@ -11,12 +11,7 @@ namespace DOGEngine;
 
 public class TestWindow : GameWindow
 {
-    //private Skybox skybox;
-    //private OldObj? cube1;
-    //private OldObj? cube2;
-    //private OldObj? cube3;
-    //private OldObj? pawn;
-    private Scene? scene;
+    private GameObject? scene;
     private readonly PlayerController camera;
 
     public TestWindow(int width, int height, string title) : base(GameWindowSettings.Default,
@@ -32,8 +27,11 @@ public class TestWindow : GameWindow
         if(IsFocused)
             camera.Update(KeyboardState, MouseState, (float)args.Time);
 
-        //Todo
-        //cube3!.Orientation = cube3.Orientation with { Y = cube3.Orientation.Y + 60 * (float)args.Time };
+        scene?.GetAllWithName("cube3").ForEach((obj =>
+        {
+            if(obj.TryGetComponent(out Transform? transform))
+                transform!.Orientation = transform.Orientation with{Y = transform.Orientation.Y + 60 * (float)args.Time};
+        }));
     }
 
     protected override void OnLoad()
@@ -51,31 +49,41 @@ public class TestWindow : GameWindow
         var shader3 = new TextureShader(carpetTexture);
         var shader4 = new PlainColorShader(new Vector3(1, 0, 0));
 
-        scene = new Scene(
+        scene = new GameObjectCollection(
             new GameObject[]
             {
-                new GameObjSkybox(new string[]
-        {
-            "../../../../DOGEngine/Texture/Skybox/right.jpg",
-            "../../../../DOGEngine/Texture/Skybox/left.jpg",
-            "../../../../DOGEngine/Texture/Skybox/top.jpg",
-            "../../../../DOGEngine/Texture/Skybox/bottom.jpg",
-            "../../../../DOGEngine/Texture/Skybox/front.jpg",
-            "../../../../DOGEngine/Texture/Skybox/back.jpg",
-        }),
-                new GameObject(new GameObject[]
+                new GameObjSkybox(new[]
                 {
+                    "../../../../DOGEngine/Texture/Skybox/right.jpg",
+                    "../../../../DOGEngine/Texture/Skybox/left.jpg",
+                    "../../../../DOGEngine/Texture/Skybox/top.jpg",
+                    "../../../../DOGEngine/Texture/Skybox/bottom.jpg",
+                    "../../../../DOGEngine/Texture/Skybox/front.jpg",
+                    "../../../../DOGEngine/Texture/Skybox/back.jpg",
+                }),
+                new(
                     new Shading(shader1),
-                    new Mesh(Cube.data),
-                    new Transform(new Vector3(-1, -1, -5)),
-                })
+                    new Mesh(Mesh.Cube),
+                    new Transform(new Vector3(-1, -1, -5))
+                ),
+                new(
+                    new Shading(shader4),
+                    new Mesh(Mesh.Cube),
+                    new Transform(new Vector3(1, 1, -5))
+                ),
+                new(
+                    new Shading(shader3),
+                    new Mesh(Mesh.Cube),
+                    new Transform(new Vector3(0, 4, -5), new Vector3(0, 1, 0), new Vector3(2, 3, 4),
+                        new Vector3(1, 0, 1)),
+                    new Name("cube3")
+                ),
+                new(
+                    new Shading(shader2),
+                    new Mesh(Mesh.FromFile("../../../../DOGEngine/RenderObjects/Models/Pawn.obj")),
+                    new Transform(new Vector3(0, -2, -7))
+                ),
             });
-
-        //cube1 = new Cube(shader1, new Vector3(-1, -1, -5));
-        //cube2 = new Cube(shader4, new Vector3(1, 1, -5));
-        //cube3 = new Cube(shader3,new Vector3(0, 4, -5), new Vector3(0, 1, 0), new Vector3(2, 3, 4), new Vector3(1, 0, 1));
-        //pawn = new ParsedModel( "../../../../DOGEngine/RenderObjects/Models/Pawn.obj", shader2, new Vector3(0, 0, -7));
-        
     }
 
     protected override void OnRenderFrame(FrameEventArgs args)
@@ -91,16 +99,8 @@ public class TestWindow : GameWindow
         if(skyBoxes.Any()) skyBoxes.First().Draw(view, projection);
 
         foreach (Mesh mesh in scene.GetAllInChildren<Mesh>())
-        {
             mesh.Draw(view, projection);
-        }
         
-        //skybox.Draw(view, projection);
-
-        //cube1!.Draw(view, projection);
-        //cube2!.Draw(view, projection);
-        //cube3!.Draw(view, projection);
-        //pawn!.Draw(view, projection);
 
         SwapBuffers();
     }

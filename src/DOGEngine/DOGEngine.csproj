@@ -11,8 +11,4 @@
         <PackageReference Include="StbImageSharp" Version="2.27.13" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Shader\Texture" />
-    </ItemGroup>
-
 </Project>
