@@ -41,7 +41,15 @@ public readonly struct VertexDataBundle
 
 public interface IPostInitializedGameObject
 {
-    internal void Initialize();
+    protected bool NotInitialized { get; set; }
+
+    internal sealed void Initialize()
+    {
+        if (NotInitialized) InitFunc();
+        NotInitialized = false;
+    }
+
+    public void InitFunc();
 }
 public class GameObject
 {
@@ -89,6 +97,7 @@ public class GameObject
     public void AddComponent(GameObject gameObject)
     {
         if (!children.TryAdd(gameObject.GetType(), gameObject)) throw new ArgumentException("Can't add component");
+        gameObject.Parent = this;
         if(gameObject is IPostInitializedGameObject initialize) initialize.Initialize();
     }
 
@@ -101,13 +110,7 @@ public class GameObject
 
     public GameObject Parent { get; internal set; }
 
-    protected GameObject(GameObject parent)
-    {
-        Parent = parent;
-        children = new Dictionary<Type, GameObject>();
-    }
-
-    public GameObject()
+    private GameObject()
     {
         Parent = this;
         children = new Dictionary<Type, GameObject>();
@@ -119,8 +122,8 @@ public class GameObject
         children = new Dictionary<Type, GameObject>();
         foreach (var child in newChildren)
         {
+            if (!children.TryAdd(child.GetType(), child)) throw new ArgumentException("Can't add component");
             child.Parent = this;
-            AddComponent(child);
         }
         foreach (var child in newChildren)
         {
@@ -134,19 +137,33 @@ public class GameObjectCollection : GameObject
 {
     private readonly List<GameObject> collection;
     public IReadOnlyCollection<GameObject> Collection => collection.AsReadOnly();
-
-    public void CollectionAddComponent(GameObject child) => collection.Add(child);
+    
     public GameObjectCollection(params GameObject[] newChildren)
     {
         collection = new List<GameObject>();
-        foreach (var child in newChildren)
+        CollectionAddComponents(newChildren);
+    }
+
+    public void CollectionAddComponent(GameObject child)
+    {
+        collection.Add(child);
+        child.Parent = this;
+        if(child is IPostInitializedGameObject initialize)
+            initialize.Initialize();
+    }
+
+    public void CollectionAddComponents(params GameObject[] children)
+    {
+        foreach (var child in children)
         {
+            collection.Add(child);
             child.Parent = this;
-            CollectionAddComponent(child);
+        }
+        foreach (var child in children)
             if(child is IPostInitializedGameObject initialize)
                 initialize.Initialize();
-        }
     }
+
 
     public override IEnumerable<T> GetAllInChildren<T>()
     {
@@ -197,7 +214,9 @@ public partial class Mesh : GameObject, IPostInitializedGameObject
         VAO = -1;
     }
 
-    public void Initialize()
+    public bool NotInitialized { get; set; } = true;
+
+    public void InitFunc()
     {
         Shader.Shader shader = Parent.GetComponent<Shading>().Shader;
         var vertices = tempData.CreateVertices(shader);
@@ -280,9 +299,17 @@ public class GameObjSkybox : GameObject //Todo: Split
     private readonly int textureHandle;
     private readonly int cubeHandle;
     private readonly Shader.Shader shader;
-    public GameObjSkybox(string[] filePath)
+    public GameObjSkybox(string directory)
     {
-        textureHandle = GetCubeMap(filePath);
+        textureHandle = GetCubeMap(new []
+        {
+            directory + "/right.jpg",
+            directory + "/left.jpg",
+            directory + "/top.jpg",
+            directory + "/bottom.jpg",
+            directory + "/front.jpg",
+            directory + "/back.jpg",
+        });
         shader = new CubeMapShader();
         cubeHandle = GetSkyBoxCube();
     }
