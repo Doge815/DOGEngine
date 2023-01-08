@@ -1,6 +1,7 @@
 using DOGEngine.Camera;
 using DOGEngine.RenderObjects;
 using DOGEngine.Shader;
+using DOGEngine.Texture;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
@@ -43,11 +44,14 @@ public class TestWindow : GameWindow
         var wallTexture = new Texture.Texture("../../../../DOGEngine/Texture/Textures/wall.jpg");
         var woodTexture = new Texture.Texture("../../../../DOGEngine/Texture/Textures/wood.jpg");
         var carpetTexture = new Texture.Texture("../../../../DOGEngine/Texture/Textures/carpet.jpg");
+        var metalTexture = new PbrTextureCollection("../../../../DOGEngine/Texture/Textures/Metal/");
 
         var shader1 = new TextureShader(wallTexture);
         var shader2 = new TextureShader(woodTexture);
         var shader3 = new TextureShader(carpetTexture);
-        var shader4 = new PlainColorShader(new Vector3(1, 0, 0));
+        var shader4 = new PlainColorShader(new Vector3(1, 1, 1));
+        var shader5 = new PlainColorShader(new Vector3(0.8f, 0.2f, 0.2f));
+        var shader6 = new PbrShader(metalTexture);
 
         scene = new GameObjectCollection(
             new GameObject[]
@@ -69,7 +73,14 @@ public class TestWindow : GameWindow
                 new(
                     new Shading(shader4),
                     new Mesh(Mesh.Cube),
-                    new Transform(new Vector3(1, 1, -5))
+                    new Transform(new Vector3(1, 1, 10)),
+                    new Lightning()
+                ),
+                new(
+                    new Shading(shader5),
+                    new Mesh(Mesh.Cube),
+                    new Transform(new Vector3(10, 1, 1)),
+                    new Lightning()
                 ),
                 new(
                     new Shading(shader3),
@@ -82,6 +93,11 @@ public class TestWindow : GameWindow
                     new Shading(shader2),
                     new Mesh(Mesh.FromFile("../../../../DOGEngine/RenderObjects/Models/Pawn.obj")),
                     new Transform(new Vector3(0, -2, -7))
+                ),
+                new(
+                    new Shading(shader6),
+                    new Mesh(Mesh.FromFile("../../../../DOGEngine/RenderObjects/Models/Sphere.obj")),
+                    new Transform(new Vector3(1, 1, -3))
                 ),
             });
     }
@@ -98,9 +114,22 @@ public class TestWindow : GameWindow
         var skyBoxes = scene!.GetAllInChildren<GameObjSkybox>().ToArray();
         if(skyBoxes.Any()) skyBoxes.First().Draw(view, projection);
 
-        foreach (Mesh mesh in scene.GetAllInChildren<Mesh>())
-            mesh.Draw(view, projection);
+        List<Lightning> lights = new List<Lightning>();
+        foreach (Lightning light in scene.GetAllInChildren<Lightning>())
+            lights.Add(light);
         
+        foreach (Shading shading in scene.GetAllInChildren<Shading>())
+        {
+            if(shading.Shader is PbrShader pbrShader)
+                foreach ((Lightning item, int index) in lights.WithIndex())
+                {
+                    pbrShader.SetVector3($"lightPositions[{index}]", item.GetPosition);
+                    pbrShader.SetVector3($"lightColors[{index}]", item.GetColor);
+                }
+        }
+            
+        foreach (Mesh mesh in scene.GetAllInChildren<Mesh>())
+            mesh.Draw(view, projection, camera.Position);
 
         SwapBuffers();
     }

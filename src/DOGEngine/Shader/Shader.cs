@@ -67,29 +67,35 @@ public abstract class Shader : IShader
     public abstract IShaderAttribute[] Attributes { get; }  
     public int Stride => Attributes.Sum(x => x.Size);
     public int Handle { get; init; }
+    private int getUniformPos(string name) {
+        if (uniformPos.TryGetValue(name, out int value)) return value; //value already found
+        int position = GL.GetUniformLocation(Handle, name);
+        uniformPos.Add(name, position);
+        return position;
+    }
 
     public void SetInt(string name, int data)
     {
         GL.UseProgram(Handle);
-        GL.Uniform1(uniformPos[name], data);
+        GL.Uniform1(getUniformPos(name), data);
     }
 
     public void SetSingle(string name, float data)
     {
         GL.UseProgram(Handle);
-        GL.Uniform1(uniformPos[name], data);
+        GL.Uniform1(getUniformPos(name), data);
     }
 
     public void SetMatrix4(string name, Matrix4 data)
     {
         GL.UseProgram(Handle);
-        GL.UniformMatrix4(uniformPos[name], true, ref data);
+        GL.UniformMatrix4(getUniformPos(name), true, ref data);
     }
 
     public void SetVector3(string name, Vector3 data)
     {
         GL.UseProgram(Handle);
-        GL.Uniform3(uniformPos[name], data);
+        GL.Uniform3(getUniformPos(name), data);
     }
 
     public virtual void Use()
@@ -140,7 +146,7 @@ public sealed class NormalShaderAttribute : IShaderAttribute
 }
 public interface INormalShader
 {
-    static abstract NormalShaderAttribute Vertex { get; }
+    static abstract NormalShaderAttribute Normal { get; }
 }
 public sealed class TextureCoordShaderAttribute : IShaderAttribute
 {
@@ -157,4 +163,21 @@ public sealed class TextureCoordShaderAttribute : IShaderAttribute
 public interface ITextureCoordShader
 {
     static abstract TextureCoordShaderAttribute TextureCoord{ get; }
+}
+
+public interface IViewShader
+{
+    public void SetView(Matrix4 view);
+}
+public interface IModelShader
+{
+    public void SetModel(Matrix4 model);
+}
+public interface IProjectionShader
+{
+    public void SetProjection(Matrix4 projection);
+}
+public interface ICameraPosShader
+{
+    public void SetCameraPos(Vector3 cameraPos);
 }

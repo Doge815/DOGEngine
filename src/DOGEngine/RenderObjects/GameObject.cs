@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using DOGEngine.Shader;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -13,9 +12,7 @@ public readonly struct VertexDataBundle
     {
         int columns = 0;
         foreach (IShaderAttribute attribute in shader.Attributes)
-        {
             columns += attribute.Size;
-        }
 
         float[] verts = new float[columns * Rows];
         foreach (IShaderAttribute attribute in shader.Attributes)
@@ -216,29 +213,36 @@ public partial class Mesh : GameObject, IPostInitializedGameObject
             interpretVertexDataFloat(shader, attribute, shader.Stride);
     }
 
-    public void Draw(Matrix4 view, Matrix4 projection)
+    public void Draw(Matrix4 view, Matrix4 projection, Vector3 cameraPosition)
     {
         if(VAO == -1) return;
         Shader.Shader shader = Parent.GetComponent<Shading>().Shader;
-        (Vector3 Position, Vector3 Orientation, Vector3 Scale, Vector3 OrientationOffset)  = GetTransformData();
         shader.Use();
-        Matrix4 model = Matrix4.CreateScale(Scale)
-                        * Matrix4.CreateTranslation(OrientationOffset)
-                        * Matrix4.CreateRotationX(MathHelper.DegreesToRadians(Orientation.X))
-                        * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(Orientation.Y))
-                        * Matrix4.CreateRotationZ(MathHelper.DegreesToRadians(Orientation.Z))
-                        * Matrix4.CreateTranslation(-OrientationOffset)
-                        * Matrix4.CreateTranslation(Position);
 
-        shader.SetMatrix4("model", model);
-        shader.SetMatrix4("view", view);
-        shader.SetMatrix4("projection", projection);
+        if (shader is IModelShader modelShader)
+        {
+            (Vector3 Position, Vector3 Orientation, Vector3 Scale, Vector3 OrientationOffset)  = GetTransformData();
+            Matrix4 model = Matrix4.CreateScale(Scale)
+                            * Matrix4.CreateTranslation(OrientationOffset)
+                            * Matrix4.CreateRotationX(MathHelper.DegreesToRadians(Orientation.X))
+                            * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(Orientation.Y))
+                            * Matrix4.CreateRotationZ(MathHelper.DegreesToRadians(Orientation.Z))
+                            * Matrix4.CreateTranslation(-OrientationOffset)
+                            * Matrix4.CreateTranslation(Position);
+            modelShader.SetModel(model);
+        }
+        if(shader is IViewShader viewShader)
+            viewShader.SetView(view);
+        if(shader is IProjectionShader projectionShader)
+            projectionShader.SetProjection(projection);
+        if(shader is ICameraPosShader cameraPosShader)
+            cameraPosShader.SetCameraPos(cameraPosition);
 
         GL.BindVertexArray(VAO);
         GL.DrawArrays(PrimitiveType.Triangles, 0, triangles);
     }
 
-    public (Vector3 Position, Vector3 Orientation, Vector3 Scale, Vector3 OrientationOffset) GetTransformData()
+    private (Vector3 Position, Vector3 Orientation, Vector3 Scale, Vector3 OrientationOffset) GetTransformData()
     {
         if (Parent.TryGetComponent<Transform>(out var transform))
             return (transform!.Position, transform.Orientation, transform.Scale, transform.OrientationOffset);
@@ -279,7 +283,7 @@ public class GameObjSkybox : GameObject //Todo: Split
     public GameObjSkybox(string[] filePath)
     {
         textureHandle = GetCubeMap(filePath);
-        shader = new Shader.CubeMapShader();
+        shader = new CubeMapShader();
         cubeHandle = GetSkyBoxCube();
     }
     private int GetCubeMap(string[] path)
@@ -390,4 +394,40 @@ public class Name : GameObject
     public string ObjName { get; }
 
     public Name(string objName) => ObjName = objName;
+}
+
+public class Lightning : GameObject
+{
+    public Vector3? Color { get; set; }
+    public Vector3? Position { get; set; }
+
+    public Vector3 GetColor
+    {
+        get => Color ?? parentColor() ?? Vector3.Zero;
+        set => Color = value;
+    }
+    public Vector3 GetPosition
+    {
+        get => Position ?? parentPosition() ?? Vector3.Zero;
+        set => Position = value;
+    }
+
+    public Lightning(Vector3? color = null, Vector3? position = null)
+    {
+        Color = color;
+        Position = position;
+    }
+
+    private Vector3? parentColor()  
+    {
+        if(Parent.TryGetComponent<Shading>(out var shading) && shading!.Shader is PlainColorShader plainColorShader)
+            return plainColorShader.Color * 255;
+        return null;
+    }
+    private Vector3? parentPosition()  
+    {
+        if(Parent.TryGetComponent<Transform>(out var transform))
+            return transform!.Position;
+        return null;
+    }
 }

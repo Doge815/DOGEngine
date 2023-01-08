@@ -2,8 +2,12 @@ using OpenTK.Graphics.OpenGL4;
 using StbImageSharp;
 
 namespace DOGEngine.Texture;
+public interface ITexture
+{
+    public void Use();
+}
 
-public class Texture
+public class Texture : ITexture
 {
     public Texture(string texturePath)
     {
@@ -21,12 +25,16 @@ public class Texture
         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
         GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
     }
-
-    public int Handle { get; }
+    private int Handle { get; }
 
     public void Use(TextureUnit unit)
     {
         GL.ActiveTexture(unit);
+        GL.BindTexture(TextureTarget.Texture2D, Handle);
+    }
+    public void Use()
+    {
+        GL.ActiveTexture(TextureUnit.Texture0);
         GL.BindTexture(TextureTarget.Texture2D, Handle);
     }
 }
