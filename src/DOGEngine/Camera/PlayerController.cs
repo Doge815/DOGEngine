@@ -18,7 +18,7 @@ public class PlayerController : Camera
     {
         PlayerControllerMode.Flat => Vector3.Normalize(Front with{Y = 0}),
         PlayerControllerMode.Free => Front,
-        _ => throw new ArgumentOutOfRangeException("unknown value")
+        _ => throw new ArgumentOutOfRangeException(nameof(MovementMode))
     };
     public Vector3 movementRight => Vector3.Normalize(Vector3.Cross(movementFront, Vector3.UnitY));
     public Vector3 movementUp => Vector3.Normalize(Vector3.Cross(movementRight, movementFront));

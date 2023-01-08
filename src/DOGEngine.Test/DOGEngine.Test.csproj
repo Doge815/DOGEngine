@@ -10,5 +10,12 @@
     <ItemGroup>
       <ProjectReference Include="..\DOGEngine\DOGEngine.csproj" />
     </ItemGroup>
+    
+    <ItemGroup>
+        <Content Include="Texture\**" CopyToOutputDirectory="Always" />
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include="Models\**" CopyToOutputDirectory="Always" />
+    </ItemGroup>
 
 </Project>

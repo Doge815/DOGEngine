@@ -6,8 +6,8 @@ namespace DOGEngine.Shader;
 
 public class PbrShader : Shader, IVertexShader, INormalShader, ITextureCoordShader, IModelShader, IViewShader, IProjectionShader, ICameraPosShader
 {
-    public PbrShader(PbrTextureCollection texture) : base("../../../../DOGEngine/Shader/Shaders/PbrShader.vert",
-        "../../../../DOGEngine/Shader/Shaders/PbrShader.frag")
+    public PbrShader(PbrTextureCollection texture) : base("Shader/Shaders/PbrShader.vert",
+        "Shader/Shaders/PbrShader.frag")
     {
         Texture = texture;
         SetInt("albedoMap", 0);

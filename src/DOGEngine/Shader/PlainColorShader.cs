@@ -14,8 +14,8 @@ public class PlainColorShader : Shader, IVertexShader, IModelShader, IViewShader
             SetVector3("aColor", value);
         }
     }
-    public PlainColorShader(Vector3 color) : base("../../../../DOGEngine/Shader/Shaders/BaseShader.vert",
-        "../../../../DOGEngine/Shader/Shaders/PlainColorShader.frag")
+    public PlainColorShader(Vector3 color) : base("Shader/Shaders/BaseShader.vert",
+        "Shader/Shaders/PlainColorShader.frag")
         => Color = color;
 
     public static VertexShaderAttribute Vertex { get; } = new(0, "aPosition");
