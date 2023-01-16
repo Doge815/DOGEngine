@@ -23,6 +23,8 @@ void OnLoad()
     var shader4 = new PlainColorShader(new Vector3(1, 1, 1));
     var shader5 = new PlainColorShader(new Vector3(0.8f, 0.2f, 0.2f));
     var shader6 = new PbrShader(metalTexture);
+
+    var font = new Font(Font.DejaVuSans, 50);
             
     scene.CollectionAddComponents(
         new GameObjSkybox("Texture/Skybox"),
@@ -59,7 +61,14 @@ void OnLoad()
             new Shading(shader6),
             new Mesh(Mesh.FromFile("Models/Sphere.obj")),
             new Transform(new Vector3(1, 1, -3))
-        )
+        ),
+        new (
+            new RenderText(font, "", new Vector2(100, -100), Corner.TopLeft, new Vector3(1, 1 ,0), 1),
+            new Name("fpsText")),
+        new (
+            new RenderText(font, "", new Vector2(100, 50), Corner.BottomLeft, new Vector3(1, 0 ,1), 1),
+            new Name("rotationText"))
+        
     );
 }
 
@@ -67,12 +76,27 @@ void OnUpdate(Window window, FrameEventArgs frameEventArgs)
 {
     if(window.IsFocused)
         camera.Update(window.KeyboardState, window.MouseState, (float)frameEventArgs.Time);
-            
+
+    Transform? cube = null;
     scene.GetAllWithName("cube3").ForEach((obj =>
     {
-        if(obj.TryGetComponent(out Transform? transform))
-            transform!.Orientation = transform.Orientation with{Y = transform.Orientation.Y + 60 * (float)frameEventArgs.Time};
+        if (obj.TryGetComponent(out Transform? transform)) cube = transform!;
     }));
+    if (cube is not null)
+    {
+        cube.Orientation = cube.Orientation with{Y = (cube.Orientation.Y + 60 * (float)frameEventArgs.Time)%360};
+        scene.GetAllWithName("rotationText").ForEach(obj =>
+        {
+            if (obj.TryGetComponent(out RenderText? renderText))
+                renderText!.Text = $"Rotation: {cube.Orientation.Y:F0}°";
+        });
+    }
+    
+    scene.GetAllWithName("fpsText").ForEach(obj =>
+    {
+        if (obj.TryGetComponent(out RenderText? renderText))
+            renderText!.Text = $"FPS: {1/frameEventArgs.Time:F2}";
+    });
 }
 
 _ = new Window(800, 800, "TestApp",

@@ -148,6 +148,22 @@ public interface INormalShader
 {
     static abstract NormalShaderAttribute Normal { get; }
 }
+public sealed class Position2DShaderAttribute : IShaderAttribute
+{
+    public int Size => 2;
+    public int Offset { get; }
+    public string AttributeName { get; }
+
+    public Position2DShaderAttribute(int offset, string attributeName)
+    {
+        Offset = offset;
+        AttributeName = attributeName;
+    }
+}
+public interface I2DPositionShader
+{
+    static abstract Position2DShaderAttribute Position2D { get; }
+}
 public sealed class TextureCoordShaderAttribute : IShaderAttribute
 {
     public int Size => 2;
