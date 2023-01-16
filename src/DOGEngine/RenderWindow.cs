@@ -81,6 +81,8 @@ public class Window
 
     public static Action BasicLoad { get; } = () =>
     {
+        GL.Enable(EnableCap.Blend);
+        GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
         GL.Enable(EnableCap.DepthTest);
         GL.ClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     };
@@ -115,6 +117,11 @@ public class Window
             
         foreach (Mesh mesh in scene.GetAllInChildren<Mesh>())
             mesh.Draw(view, projection, camera.Position);
+
+        foreach (RenderText text in scene.GetAllInChildren<RenderText>())
+        {
+            text.Draw(camera.Width, camera.Height);
+        }
     };
     public static Action<ResizeEventArgs, Camera.Camera> BasicResize { get; } = (args, camera) =>
     {
