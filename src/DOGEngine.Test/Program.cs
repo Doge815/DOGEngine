@@ -1,11 +1,12 @@
 ﻿using DOGEngine;
 using DOGEngine.Camera;
 using DOGEngine.RenderObjects;
+using DOGEngine.RenderObjects.Properties;
+using DOGEngine.RenderObjects.Text;
 using DOGEngine.Shader;
 using DOGEngine.Texture;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
-
 
 GameObjectCollection scene = new GameObjectCollection();
 PlayerController camera = new PlayerController(){Yaw = -90, Pitch = 1.53f};
@@ -27,7 +28,7 @@ void OnLoad()
     var font = new Font(Font.DejaVuSans, 50);
             
     scene.CollectionAddComponents(
-        new GameObjSkybox("Texture/Skybox"),
+        new Skybox("Texture/Skybox"),
         new(
             new Shading(shader1),
             new Mesh(Mesh.Cube),

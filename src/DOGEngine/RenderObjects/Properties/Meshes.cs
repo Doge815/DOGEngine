@@ -1,21 +1,25 @@
+using System.Collections.Concurrent;
 using DOGEngine.Shader;
 
-namespace DOGEngine.RenderObjects;
+namespace DOGEngine.RenderObjects.Properties;
 
 public partial class Mesh
 {
     public static VertexDataBundle FromFile(string filePath)
     {
-        List<(float, float, float)> vertices = new List<(float, float, float)>();
-        List<(float, float, float)> normals= new List<(float, float, float)>();
-        List<(float, float)> textureCoords= new List<(float, float)>();
-        List<((int, int?, int?), (int, int?, int?), (int, int?, int?))> faces =
-            new List<((int, int?, int?), (int, int?, int?), (int, int?, int?))>();
+        List<(float, float, float)> vertices = new ();
+        List<(float, float, float)> normals= new ();
+        List<(float, float)> textureCoords= new ();
+        List<((int, int?, int?), (int, int?, int?), (int, int?, int?))> faces = new ();
+        
         void ParseVertex(string[] split)
         {
             if (split.Length != 4) throw new ArgumentException("Bad line");
-            if(float.TryParse(split[1], out float X) && float.TryParse(split[2], out float Y) && float.TryParse(split[3], out float Z))
-                vertices.Add(new (X, Y, Z));
+            if (float.TryParse(split[1], out float X) && float.TryParse(split[2], out float Y) &&
+                float.TryParse(split[3], out float Z))
+
+                lock (vertices)
+                    vertices.Add(new (X, Y, Z));
             else
                 throw new ArgumentException("Bad line");
         }
@@ -23,8 +27,10 @@ public partial class Mesh
         void ParseNormal(string[] split)
         {
             if (split.Length != 4) throw new ArgumentException("Bad line");
-            if(float.TryParse(split[1], out float X) && float.TryParse(split[2], out float Y) && float.TryParse(split[3], out float Z))
-                normals.Add(new (X, Y, Z));
+            if (float.TryParse(split[1], out float X) && float.TryParse(split[2], out float Y) &&
+                float.TryParse(split[3], out float Z))
+                lock (normals)
+                    normals.Add(new (X, Y, Z));
             else
                 throw new ArgumentException("Bad line");
         }
@@ -32,8 +38,9 @@ public partial class Mesh
         void ParseTextureCoord(string[] split)
         {
             if (split.Length != 3) throw new ArgumentException("Bad line");
-            if(float.TryParse(split[1], out float X) && float.TryParse(split[2], out float Y))
-                textureCoords.Add(new (X, Y));
+            if (float.TryParse(split[1], out float X) && float.TryParse(split[2], out float Y))
+                lock (textureCoords)
+                    textureCoords.Add(new (X, Y));
             else
                 throw new ArgumentException("Bad line");
         }
@@ -64,18 +71,18 @@ public partial class Mesh
             }
             if (split.Length != 4) throw new ArgumentException("Bad line");
             if(TryParseVertex(split[1], out var X) && TryParseVertex(split[2], out var Y) && TryParseVertex(split[3], out var Z))
-                faces.Add(new (X, Y, Z));
+                lock (faces)
+                    faces.Add(new (X, Y, Z));
             else
                 throw new ArgumentException("Bad line");
         }
-        
-        var lines = File.ReadAllLines(filePath);
-        foreach (var line in lines)
+
+        void ParseLine(string line)
         {
-            if(line.Length == 0) continue;
-            if(line[0] == '#') continue;
+            if(line.Length == 0) return;
+            if(line[0] == '#') return;
             var split = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            if(split.Length == 0) continue;
+            if(split.Length == 0) return;
             switch (split[0])
             {
                 case "v": ParseVertex(split); break;
@@ -89,6 +96,8 @@ public partial class Mesh
                 default: throw new ArgumentException("Bad line");
             }
         }
+        
+        Parallel.ForEach(File.ReadAllLines(filePath), ParseLine);
 
         float[] verts = new float[faces.Count * 9];
         float[]? coords = faces.First().Item1.Item2 is null? null : new float[faces.Count * 6];

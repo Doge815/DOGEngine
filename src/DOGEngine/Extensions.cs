@@ -1,3 +1,5 @@
+using FreeTypeSharp.Native;
+
 namespace DOGEngine;
 
 public static class Extensions

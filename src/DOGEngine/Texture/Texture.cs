@@ -1,5 +1,4 @@
 using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
 using StbImageSharp;
 
 namespace DOGEngine.Texture;
@@ -37,39 +36,5 @@ public class Texture : ITexture
     {
         GL.ActiveTexture(TextureUnit.Texture0);
         GL.BindTexture(TextureTarget.Texture2D, Handle);
-    }
-}
-
-public struct Font
-{
-    public static string DejaVuSans { get; } = "/usr/share/fonts/TTF/DejaVuSans.ttf";
-    public string FontFile { get; init; }
-    public uint Height { get; set; }
-
-    public Font(string fontFile, uint height)
-    {
-        FontFile = fontFile;
-        Height = height;
-    }
-}
-public class RenderCharacter : ITexture
-{
-    private int Handle { get; init; }
-    public Vector2 Size { get; init; }
-    public Vector2 Bearing { get; init; }
-    public uint Offset { get; init; }
-
-    public void Use()
-    {
-        GL.ActiveTexture(TextureUnit.Texture0);
-        GL.BindTexture(TextureTarget.Texture2D, Handle);
-    }
-
-    public RenderCharacter(int handle, Vector2 size, Vector2 bearing, uint offset)
-    {
-        Handle = handle;
-        Size = size;
-        Bearing = bearing;
-        Offset = offset;
     }
 }
