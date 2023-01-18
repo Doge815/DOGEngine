@@ -3,7 +3,7 @@ using DOGEngine.RenderObjects;
 using DOGEngine.RenderObjects.Properties;
 using DOGEngine.RenderObjects.Text;
 using DOGEngine.Shader;
-using OpenTK.Graphics.OpenGL;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -77,10 +77,13 @@ public class Window
         set => window.Title = value;
     }
 
+
     public KeyboardState KeyboardState => window.KeyboardState;
     public MouseState MouseState => window.MouseState;
     public bool IsFocused => window.IsFocused;
     public void Close() => window.Close();
+
+    public void GrabCursor(bool grab) => window.CursorState = grab ? CursorState.Grabbed : CursorState.Normal;
 
     public static Action BasicLoad { get; } = () =>
     {
@@ -88,6 +91,7 @@ public class Window
         GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
         GL.Enable(EnableCap.DepthTest);
         GL.ClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+        
     };
     public static Action<Window> BasicUpdate { get; } = (window) =>
     {

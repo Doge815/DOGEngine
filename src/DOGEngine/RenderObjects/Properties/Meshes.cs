@@ -5,7 +5,8 @@ namespace DOGEngine.RenderObjects.Properties;
 
 public partial class Mesh
 {
-    public static VertexDataBundle FromFile(string filePath)
+    public static VertexDataBundle FromFile(string filePath) => FromFile(filePath, false);
+    internal static VertexDataBundle FromFile(string filePath, bool verticesOnly)
     {
         List<(float, float, float)> vertices = new ();
         List<(float, float, float)> normals= new ();
@@ -26,6 +27,7 @@ public partial class Mesh
         
         void ParseNormal(string[] split)
         {
+            if(verticesOnly) return;
             if (split.Length != 4) throw new ArgumentException("Bad line");
             if (float.TryParse(split[1], out float X) && float.TryParse(split[2], out float Y) &&
                 float.TryParse(split[3], out float Z))
@@ -37,6 +39,7 @@ public partial class Mesh
         
         void ParseTextureCoord(string[] split)
         {
+            if(verticesOnly) return;
             if (split.Length != 3) throw new ArgumentException("Bad line");
             if (float.TryParse(split[1], out float X) && float.TryParse(split[2], out float Y))
                 lock (textureCoords)
@@ -97,11 +100,12 @@ public partial class Mesh
             }
         }
         
-        Parallel.ForEach(File.ReadAllLines(filePath), ParseLine);
+        foreach (string line in File.ReadAllLines(filePath))
+            ParseLine(line);
 
         float[] verts = new float[faces.Count * 9];
-        float[]? coords = faces.First().Item1.Item2 is null? null : new float[faces.Count * 6];
-        float[]? norms = faces.First().Item1.Item3 is null? null : new float[faces.Count * 9];
+        float[]? coords = verticesOnly ? null : faces.First().Item1.Item2 is null? null : new float[faces.Count * 6];
+        float[]? norms = verticesOnly ? null : faces.First().Item1.Item3 is null? null : new float[faces.Count * 9];
 
         for (int i = 0; i < faces.Count; i++)
         {
@@ -156,6 +160,23 @@ public partial class Mesh
             data.Add(typeof(NormalShaderAttribute), norms);
         return new VertexDataBundle(data, faces.Count * 3);
     }
+    public static readonly VertexDataBundle Triangle = new VertexDataBundle(new Dictionary<Type, float[]>()
+    {
+        { typeof(VertexShaderAttribute), new[]
+            {
+                -0.5f, -0.5f, 0f, 
+                0.5f, -0.5f, 0f, 
+                0.5f, 0.5f, 0f, 
+            }
+        },
+        { typeof(TextureCoordShaderAttribute), new[]
+            {
+                0.0f, 0.0f,
+                1.0f, 0.0f,
+                1.0f, 1.0f,
+            }
+        },
+    }, 3);
     public static readonly VertexDataBundle Cube = new VertexDataBundle(new Dictionary<Type, float[]>()
     {
         { typeof(VertexShaderAttribute), new[]

@@ -1,5 +1,6 @@
 ﻿using DOGEngine;
 using DOGEngine.Camera;
+using DOGEngine.Physics;
 using DOGEngine.RenderObjects;
 using DOGEngine.RenderObjects.Properties;
 using DOGEngine.RenderObjects.Text;
@@ -7,12 +8,16 @@ using DOGEngine.Shader;
 using DOGEngine.Texture;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
+using OpenTK.Windowing.GraphicsLibraryFramework;
+using Window = DOGEngine.Window;
 
 GameObjectCollection scene = new GameObjectCollection();
 PlayerController camera = new PlayerController(){Yaw = -90, Pitch = 1.53f};
+int hitCounter = 0;
 
-void OnLoad()
+void OnLoad(Window window)
 {
+    window.GrabCursor(true);
     var wallTexture = new Texture("Texture/Textures/wall.jpg");
     var woodTexture = new Texture("Texture/Textures/wood.jpg");
     var carpetTexture = new Texture("Texture/Textures/carpet.jpg");
@@ -26,13 +31,20 @@ void OnLoad()
     var shader6 = new PbrShader(metalTexture);
 
     var font = new Font(Font.DejaVuSans, 50);
-            
+
     scene.CollectionAddComponents(
         new Skybox("Texture/Skybox"),
         new(
             new Shading(shader1),
+            new Mesh(Mesh.Triangle),
+            new Transform(new Vector3(0, 0, 5)),
+            new Name("testTriangle")
+        ),
+        new(
+            new Shading(shader1),
             new Mesh(Mesh.Cube),
-            new Transform(new Vector3(-1, -1, -5))
+            new Transform(new Vector3(-1, -1, -5)),
+            new Name("hitCube")
         ),
         new(
             new Shading(shader4),
@@ -56,16 +68,21 @@ void OnLoad()
         new(
             new Shading(shader2),
             new Mesh(Mesh.FromFile("Models/Pawn.obj")),
+            new Collider("Models/PawnLowPoly.obj"),
             new Transform(new Vector3(0, -2, -7))
         ),
         new(
             new Shading(shader6),
             new Mesh(Mesh.FromFile("Models/Sphere.obj")),
+            new Collider("Models/SphereLowPoly.obj"),
             new Transform(new Vector3(1, 1, -3))
         ),
         new (
             new RenderText(font, "", new Vector2(100, -100), Corner.TopLeft, new Vector3(1, 1 ,0), 1),
             new Name("fpsText")),
+        new (
+            new RenderText(font, "", new Vector2(100, -200), Corner.TopLeft, new Vector3(1, 1 ,0), 1),
+            new Name("hitText")),
         new (
             new RenderText(font, "", new Vector2(100, 50), Corner.BottomLeft, new Vector3(1, 0 ,1), 1),
             new Name("rotationText"))
@@ -77,6 +94,13 @@ void OnUpdate(Window window, FrameEventArgs frameEventArgs)
 {
     if(window.IsFocused)
         camera.Update(window.KeyboardState, window.MouseState, (float)frameEventArgs.Time);
+    
+    if (window.MouseState.IsButtonPressed(MouseButton.Button1))
+    {
+        var x = scene.CastRay(camera.Position, camera.Front);
+        if (x is not null && x.Parent.TryGetComponent(out Name? name) && name!.ObjName == "hitCube")
+            hitCounter++;
+    }
 
     Transform? cube = null;
     scene.GetAllWithName("cube3").ForEach((obj =>
@@ -98,13 +122,19 @@ void OnUpdate(Window window, FrameEventArgs frameEventArgs)
         if (obj.TryGetComponent(out RenderText? renderText))
             renderText!.Text = $"FPS: {1/frameEventArgs.Time:F2}";
     });
+    scene.GetAllWithName("hitText").ForEach(obj =>
+    {
+        if (obj.TryGetComponent(out RenderText? renderText))
+            renderText!.Text = $"Cube hits: {hitCounter}";
+    });
+
 }
 
 _ = new Window(800, 800, "TestApp",
-    (_) =>
+    (window) =>
     {
         Window.BasicLoad();
-        OnLoad();
+        OnLoad(window);
     },
     (_, _) => Window.BasicRender(scene, camera),
     (window, frameEventArgs) =>
