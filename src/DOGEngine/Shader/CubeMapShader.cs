@@ -1,5 +1,3 @@
-using OpenTK.Mathematics;
-
 namespace DOGEngine.Shader;
 
 public class CubeMapShader : Shader, IVertexShader, IModelShader, IViewShader, IProjectionShader

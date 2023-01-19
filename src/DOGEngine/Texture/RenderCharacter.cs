@@ -1,6 +1,3 @@
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
-
 namespace DOGEngine.Texture;
 
 public class RenderCharacter : ITexture

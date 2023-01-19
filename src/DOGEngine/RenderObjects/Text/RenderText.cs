@@ -1,7 +1,5 @@
 using DOGEngine.Shader;
 using DOGEngine.Texture;
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
 using FreeTypeSharp.Native;
 using static FreeTypeSharp.Native.FT;
 

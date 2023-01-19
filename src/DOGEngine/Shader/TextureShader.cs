@@ -1,6 +1,3 @@
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
-
 namespace DOGEngine.Shader;
 
 public class TextureShader : Shader, IVertexShader, ITextureCoordShader, IModelShader, IViewShader, IProjectionShader

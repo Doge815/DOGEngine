@@ -1,13 +1,7 @@
-using System.Data.Common;
 using DOGEngine.RenderObjects;
 using DOGEngine.RenderObjects.Properties;
 using DOGEngine.RenderObjects.Text;
 using DOGEngine.Shader;
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Windowing.Common;
-using OpenTK.Windowing.Desktop;
-using OpenTK.Windowing.GraphicsLibraryFramework;
-using Mesh = DOGEngine.RenderObjects.Properties.Mesh;
 
 namespace DOGEngine;
 

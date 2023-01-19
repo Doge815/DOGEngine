@@ -1,8 +1,6 @@
-using System.Runtime.InteropServices.JavaScript;
 using DOGEngine.RenderObjects;
 using DOGEngine.RenderObjects.Properties;
 using DOGEngine.Shader;
-using OpenTK.Mathematics;
 
 namespace DOGEngine.Physics;
 

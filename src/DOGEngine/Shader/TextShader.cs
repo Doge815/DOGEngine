@@ -1,5 +1,4 @@
 using DOGEngine.Texture;
-using OpenTK.Mathematics;
 
 namespace DOGEngine.Shader;
 

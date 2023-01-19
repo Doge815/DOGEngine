@@ -1,5 +1,4 @@
 using DOGEngine.Shader;
-using OpenTK.Mathematics;
 
 namespace DOGEngine.RenderObjects.Properties;
 

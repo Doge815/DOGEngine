@@ -1,5 +1,3 @@
-using OpenTK.Mathematics;
-
 namespace DOGEngine.Shader;
 
 public class PlainColorShader : Shader, IVertexShader, IModelShader, IViewShader, IProjectionShader

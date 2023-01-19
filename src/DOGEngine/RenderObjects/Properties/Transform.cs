@@ -1,5 +1,3 @@
-using OpenTK.Mathematics;
-
 namespace DOGEngine.RenderObjects.Properties;
 
 public class Transform : GameObject

@@ -1,7 +1,3 @@
-using System.Diagnostics;
-using OpenTK.Mathematics;
-using OpenTK.Windowing.GraphicsLibraryFramework;
-
 namespace DOGEngine.Camera;
 
 public enum PlayerControllerMode

@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using DOGEngine.Shader;
 
 namespace DOGEngine.RenderObjects.Properties;

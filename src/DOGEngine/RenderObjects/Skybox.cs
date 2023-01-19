@@ -1,6 +1,4 @@
 using DOGEngine.Shader;
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
 using StbImageSharp;
 
 namespace DOGEngine.RenderObjects;

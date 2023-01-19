@@ -1,5 +1,3 @@
-using OpenTK.Graphics.OpenGL4;
-
 namespace DOGEngine.Texture;
 
 public class PbrTextureCollection : ITexture

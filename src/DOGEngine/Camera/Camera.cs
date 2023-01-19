@@ -1,5 +1,3 @@
-using OpenTK.Mathematics;
-
 namespace DOGEngine.Camera;
 
 public class Camera
