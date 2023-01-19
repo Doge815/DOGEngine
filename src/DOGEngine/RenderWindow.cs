@@ -27,6 +27,7 @@ internal class RenderWindow : GameWindow
     {
         base.OnLoad();
         OnLoadAction();
+        Focus();
     }
 
     protected override void OnUpdateFrame(FrameEventArgs args)

@@ -14,6 +14,7 @@ using Window = DOGEngine.Window;
 GameObjectCollection scene = new GameObjectCollection();
 PlayerController camera = new PlayerController(){Yaw = -90, Pitch = 1.53f};
 int hitCounter = 0;
+bool focused = true;
 
 void OnLoad(Window window)
 {
@@ -92,8 +93,23 @@ void OnLoad(Window window)
 
 void OnUpdate(Window window, FrameEventArgs frameEventArgs)
 {
-    if(window.IsFocused)
+    if (focused)
+    {
         camera.Update(window.KeyboardState, window.MouseState, (float)frameEventArgs.Time);
+        if (window.IsFocused)
+            window.GrabCursor(true);
+    }
+
+    if (window.IsFocused && !focused && window.MouseState.IsButtonPressed(MouseButton.Button1))
+    {
+        focused = true;
+    }
+
+if (window.IsFocused && window.KeyboardState.IsKeyPressed(Keys.E))
+    {
+        focused = false;
+        window.GrabCursor(false);
+    }
     
     if (window.MouseState.IsButtonPressed(MouseButton.Button1))
     {

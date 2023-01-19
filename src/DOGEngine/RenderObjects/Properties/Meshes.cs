@@ -99,7 +99,7 @@ public partial class Mesh
             }
         }
         
-        foreach (string line in File.ReadAllLines(filePath))
+        foreach (string line in File.ReadLines(filePath))
             ParseLine(line);
 
         float[] verts = new float[faces.Count * 9];
