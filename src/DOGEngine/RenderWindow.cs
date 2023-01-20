@@ -86,7 +86,6 @@ public class Window
         GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
         GL.Enable(EnableCap.DepthTest);
         GL.ClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-        
     };
     public static Action<Window> BasicUpdate { get; } = (window) =>
     {

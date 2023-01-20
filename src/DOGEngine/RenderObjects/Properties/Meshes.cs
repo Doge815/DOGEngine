@@ -7,6 +7,78 @@ public partial class Mesh
     public static VertexDataBundle FromFile(string filePath) => FromFile(filePath, false);
     internal static VertexDataBundle FromFile(string filePath, bool verticesOnly)
     {
+        if (File.Exists(filePath + ".agr")) return FromAgr(filePath + ".agr", verticesOnly);
+        else if (File.Exists(filePath + ".obj"))
+        {
+            var data = FromObj(filePath + ".obj", verticesOnly);
+            SaveAgr(in data, filePath + ".agr");
+            return data;
+        }
+        else throw new FileNotFoundException($"Can't find {filePath}.obj or {filePath}.agr");
+    }
+
+    private static VertexDataBundle FromAgr(string filePath, bool verticesOnly)
+    {
+        static Type GetTye(ReadOnlySpan<char> name) => name switch
+        {
+            "normal" => typeof(NormalShaderAttribute),
+            "vertex" => typeof(VertexShaderAttribute),
+            "texture" => typeof(TextureCoordShaderAttribute),
+            _ => throw new ArgumentException(nameof(name))
+        };
+        const int BufferSize = 1024 * 1;
+        using var fileStream = File.OpenRead(filePath);
+        using var streamReader = new StreamReader(fileStream, System.Text.Encoding.UTF8, true, BufferSize);
+        string? line = streamReader.ReadLine();
+        if (line != "AGRv1.0") throw new ArgumentException();
+        Dictionary<Type, float[]> data = new ();
+        while ((line = streamReader.ReadLine()) != null)
+        {
+            string? secondLine = streamReader.ReadLine();
+            if (secondLine is null) throw new AggregateException();
+            var firstSplit = line.SplitLine(',');
+            firstSplit.MoveNext();
+            Type cur = GetTye(firstSplit.Current);
+            if(verticesOnly && cur != typeof(VertexShaderAttribute)) continue;
+            firstSplit.MoveNext();
+            float[] values = new float[int.Parse(firstSplit.Current)];
+            int index = 0;
+            foreach (ReadOnlySpan<char> value in secondLine.SplitLine(','))
+            {
+                values[index] = float.Parse(value);
+                index++;
+            }
+            data.Add(cur, values);
+        }
+
+        return new VertexDataBundle(data, data[typeof(VertexShaderAttribute)].Length / 3);
+    }
+
+    private  static void SaveAgr(in VertexDataBundle data, string filePath)
+    {
+        string GetName(Type t)
+        {
+            if (t == typeof(VertexShaderAttribute)) return "vertex";
+            else if (t == typeof(TextureCoordShaderAttribute)) return "texture";
+            else if (t == typeof(NormalShaderAttribute)) return "normal";
+            throw new ArgumentException(nameof(t));
+        }
+        using StreamWriter file = new(filePath);
+        file.WriteLine("AGRv1.0");
+        foreach (var pair in data.Data)
+        {
+            file.WriteLine($"{GetName(pair.Key)},{pair.Value.Length}");
+            foreach (float value in pair.Value)
+            {
+                file.Write(value);
+                file.Write(',');
+            }
+            file.WriteLine();
+        }
+        file.Close();
+    }
+    private static VertexDataBundle FromObj(string filePath, bool verticesOnly)
+    {
         List<(float, float, float)> vertices = new ();
         List<(float, float, float)> normals= new ();
         List<(float, float)> textureCoords= new ();
@@ -158,6 +230,7 @@ public partial class Mesh
         if(norms is not null)
             data.Add(typeof(NormalShaderAttribute), norms);
         return new VertexDataBundle(data, faces.Count * 3);
+        
     }
     public static readonly VertexDataBundle Triangle = new VertexDataBundle(new Dictionary<Type, float[]>()
     {

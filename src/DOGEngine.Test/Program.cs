@@ -18,7 +18,6 @@ bool focused = true;
 
 void OnLoad(Window window)
 {
-    window.GrabCursor(true);
     var wallTexture = new Texture("Texture/Textures/wall.jpg");
     var woodTexture = new Texture("Texture/Textures/wood.jpg");
     var carpetTexture = new Texture("Texture/Textures/carpet.jpg");
@@ -68,14 +67,14 @@ void OnLoad(Window window)
         ),
         new(
             new Shading(shader2),
-            new Mesh(Mesh.FromFile("Models/Pawn.obj")),
-            new Collider("Models/PawnLowPoly.obj"),
+            new Mesh(Mesh.FromFile("Models/Pawn")),
+            new Collider("Models/PawnLowPoly"),
             new Transform(new Vector3(0, -2, -7))
         ),
         new(
             new Shading(shader6),
-            new Mesh(Mesh.FromFile("Models/Sphere.obj")),
-            new Collider("Models/SphereLowPoly.obj"),
+            new Mesh(Mesh.FromFile("Models/Sphere")),
+            new Collider("Models/SphereLowPoly"),
             new Transform(new Vector3(1, 1, -3))
         ),
         new (
@@ -89,6 +88,7 @@ void OnLoad(Window window)
             new Name("rotationText"))
         
     );
+    window.GrabCursor(true);
 }
 
 void OnUpdate(Window window, FrameEventArgs frameEventArgs)
@@ -105,7 +105,7 @@ void OnUpdate(Window window, FrameEventArgs frameEventArgs)
         focused = true;
     }
 
-if (window.IsFocused && window.KeyboardState.IsKeyPressed(Keys.E))
+    if (window.IsFocused && window.KeyboardState.IsKeyPressed(Keys.E))
     {
         focused = false;
         window.GrabCursor(false);
