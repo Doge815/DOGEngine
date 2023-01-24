@@ -13,7 +13,7 @@ public interface IPostInitializedGameObject
         NotInitialized = false;
     }
 
-    public void InitFunc();
+    protected void InitFunc();
 }
 public class GameObject
 {
@@ -73,6 +73,8 @@ public class GameObject
     }
 
     public GameObject Parent { get; internal set; }
+
+    public GameObject Root => Parent == this ? this : Parent.Root;
 
     public GameObject(params GameObject[] newChildren)
     {

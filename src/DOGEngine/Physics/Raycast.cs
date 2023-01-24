@@ -4,7 +4,7 @@ using DOGEngine.Shader;
 
 namespace DOGEngine.Physics;
 
-internal record struct Triangle(Vector3 vertex1, Vector3 vertex2, Vector3 vertex3, Mesh owner);
+internal record struct Triangle(Vector3 vertex1, Vector3 vertex2, Vector3 vertex3, Collider owner);
 
 public static class Raycast
 {
@@ -38,19 +38,19 @@ public static class Raycast
 
     internal static IEnumerable<Triangle> GetAllTriangles(this GameObject scene, bool translate = true)
     {
-        foreach (Mesh mesh in scene.GetAllInChildren<Mesh>())
+        foreach (Collider collider in scene.GetAllInChildren<Collider>())
         {
-            var model = mesh.CreateModelMatrix();
-            var vertexData = mesh.ColliderVertexData;
+            var model = Mesh.GetModel(collider);
+            var vertexData = collider.ColliderVertexData;
             for (int i = 0; i < vertexData.Length; i += 9)
             {
                 var vertex1 = new Vector4(vertexData[i + 0], vertexData[i + 1], vertexData[i + 2], 1);
                 var vertex2 = new Vector4(vertexData[i + 3], vertexData[i + 4], vertexData[i + 5], 1);
                 var vertex3 = new Vector4(vertexData[i + 6], vertexData[i + 7], vertexData[i + 8], 1);
-                if (!translate) yield return new Triangle(vertex1.Xyz, vertex2.Xyz, vertex3.Xyz, mesh);
+                if (!translate) yield return new Triangle(vertex1.Xyz, vertex2.Xyz, vertex3.Xyz, collider);
                 else
                 {
-                    yield return new Triangle((vertex1 * model).Xyz, (vertex2 * model).Xyz, (vertex3 * model).Xyz, mesh);
+                    yield return new Triangle((vertex1 * model).Xyz, (vertex2 * model).Xyz, (vertex3 * model).Xyz, collider);
                 }
                 
             }

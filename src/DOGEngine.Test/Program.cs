@@ -33,6 +33,7 @@ void OnLoad(Window window)
     var font = new Font(Font.DejaVuSans, 50);
 
     scene.CollectionAddComponents(
+        new Physics(),
         new Skybox("Texture/Skybox"),
         new(
             new Shading(shader1),

@@ -2,30 +2,21 @@ using DOGEngine.Shader;
 
 namespace DOGEngine.RenderObjects.Properties;
 
-public interface IColliderVertexDataSupplier
-{
-    public float[] ColliderVertexData { get; }
-}
-public partial class Mesh : GameObject, IPostInitializedGameObject, IColliderVertexDataSupplier
+public partial class Mesh : GameObject, IPostInitializedGameObject
 {
     private int VAO; 
     private int triangles;
 
     private readonly VertexDataBundle tempData;
-    public Mesh(VertexDataBundle data)
+    private bool createCollider;
+    public Mesh(VertexDataBundle data, bool createColliderIfNotExistent = true)
     {
         tempData = data;
         VAO = -1;
+        createCollider = createColliderIfNotExistent;
     }
     
-    public float[] ColliderVertexData {
-        get
-        {
-            if (Parent.TryGetComponent(out Collider? collider))
-                return collider!.ColliderVertexData;
-            return tempData.Data[typeof(VertexShaderAttribute)];
-        }
-    }
+    internal float[] VertexData => tempData.Data[typeof(VertexShaderAttribute)];
 
     public bool NotInitialized { get; set; } = true;
 
@@ -43,6 +34,11 @@ public partial class Mesh : GameObject, IPostInitializedGameObject, IColliderVer
 
         foreach (IShaderAttribute attribute in shader.Attributes)
             interpretVertexDataFloat(shader, attribute, shader.Stride);
+
+        if (!Parent.TryGetComponent(out Collider _))
+        {
+            Parent.AddComponent(new Collider());
+        }
     }
 
     public void Draw(Matrix4 view, Matrix4 projection, Vector3 cameraPosition)
@@ -52,7 +48,7 @@ public partial class Mesh : GameObject, IPostInitializedGameObject, IColliderVer
         shader.Use();
 
         if (shader is IModelShader modelShader)
-            modelShader.SetModel(CreateModelMatrix());
+            modelShader.SetModel(GetModel(this));
         if(shader is IViewShader viewShader)
             viewShader.SetView(view);
         if(shader is IProjectionShader projectionShader)
@@ -64,24 +60,10 @@ public partial class Mesh : GameObject, IPostInitializedGameObject, IColliderVer
         GL.DrawArrays(PrimitiveType.Triangles, 0, triangles);
     }
 
-    internal (Vector3 Position, Vector3 Orientation, Vector3 Scale, Vector3 OrientationOffset) GetTransformData()
-    {
-        if (Parent.TryGetComponent(out Transform? transform))
-            return (transform!.Position, transform.Orientation, transform.Scale, transform.OrientationOffset);
-        return (Vector3.Zero, Vector3.Zero, Vector3.One, Vector3.Zero);
-    }
+    private static readonly Matrix4 defaultModel =
+        Transform.CreateModelMatrix(Vector3.One, Vector3.Zero, Vector3.Zero, Vector3.Zero);
+    internal static Matrix4 GetModel(GameObject obj) => obj.Parent.TryGetComponent(out Transform? transform) ? transform!.Model : defaultModel;
 
-    internal Matrix4 CreateModelMatrix()
-    {
-        (Vector3 Position, Vector3 Orientation, Vector3 Scale, Vector3 OrientationOffset)  = GetTransformData();
-        return Matrix4.CreateScale(Scale)
-               * Matrix4.CreateTranslation(OrientationOffset)
-               * Matrix4.CreateRotationX(MathHelper.DegreesToRadians(Orientation.X))
-               * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(Orientation.Y))
-               * Matrix4.CreateRotationZ(MathHelper.DegreesToRadians(Orientation.Z))
-               * Matrix4.CreateTranslation(-OrientationOffset)
-               * Matrix4.CreateTranslation(Position);
-    }
     private void interpretVertexData(Shader.Shader shader, string attribute, int size, VertexAttribPointerType type, int stride, int offset)
     {
         int index = shader.GetAttributeLocation(attribute);
