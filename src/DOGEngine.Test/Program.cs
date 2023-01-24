@@ -42,6 +42,12 @@ void OnLoad(Window window)
             new Name("testTriangle")
         ),
         new(
+            new Shading(shader3),
+            new Mesh(Mesh.Cube),
+            new Transform(new Vector3(-3, 1, -3)),
+            new Collider(PhysicsType.CreateActive(1))
+        ),
+        new(
             new Shading(shader1),
             new Mesh(Mesh.Cube),
             new Transform(new Vector3(-1, -1, -5)),
@@ -153,7 +159,7 @@ _ = new Window(800, 800, "TestApp",
         Window.BasicLoad();
         OnLoad(window);
     },
-    (_, _) => Window.BasicRender(scene, camera),
+    (_, frameEventArgs) => Window.BasicRender(scene, camera, frameEventArgs),
     (window, frameEventArgs) =>
     {
         Window.BasicUpdate(window);

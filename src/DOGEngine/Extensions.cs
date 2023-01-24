@@ -12,7 +12,7 @@ public static class Extensions
     public static IEnumerable<(T item, int index)> WithIndex<T>(this IEnumerable<T> source) => source.Select((item, index) => (item, index));
 
     public static StringSplitEnumerator SplitLine(this string str, char split) => new (str.AsSpan(), split);
-    public static OpenTK.Mathematics.Matrix4 Convert(this BulletSharp.Math.Matrix matrix) =>
+    /*public static OpenTK.Mathematics.Matrix4 Convert(this BulletSharp.Math.Matrix matrix) =>
         new OpenTK.Mathematics.Matrix4(
             matrix.M11, 
             matrix.M12, 
@@ -49,7 +49,7 @@ public static class Extensions
             matrix.M42, 
             matrix.M43, 
             matrix.M44
-        );
+        );*/
 }
 public ref struct StringSplitEnumerator
 {

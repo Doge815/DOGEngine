@@ -1,4 +1,6 @@
+using BulletSharp.Math;
 using DOGEngine.Shader;
+using Vector3 = BulletSharp.Math.Vector3;
 
 namespace DOGEngine.RenderObjects.Properties;
 
@@ -27,27 +29,28 @@ public class Collider : GameObject, IPostInitializedGameObject
     {
         colliderVertexData = Mesh.FromFile(file, true).Data[typeof(VertexShaderAttribute)];
         PhysicsType = physicsType ?? PhysicsType.CreateNone();
-        addToPhysicsEngine();
     }
 
     public Collider(PhysicsType? physicsType = null) //use the mesh as the collider
     {
         colliderVertexData = null;
         PhysicsType = physicsType ?? PhysicsType.CreateNone();
-        addToPhysicsEngine();
     }
 
     private void addToPhysicsEngine()
     {
+        void SetTranslation(Transform transform, Matrix translation)
+        {
+            transform.Model = translation.Convert();
+        }
         if (Root.TryGetComponent(out Physics.Physics? physics))
         {
             if (PhysicsType.Type == PhysicsSimulationType.Dynamic)
             {
-                physics!.CreateDynamic(PhysicsType.Mass);
-            }
-            else
-            {
-                
+                if(Parent.TryGetComponent(out Transform? transform)) 
+                    physics!.CreateDynamic(PhysicsType.Mass, transform!.Position.Convert(), matrix => SetTranslation(transform!, matrix));
+                else
+                    physics!.CreateDynamic(PhysicsType.Mass, Vector3.Zero, null);
             }
         }
     }
@@ -55,5 +58,9 @@ public class Collider : GameObject, IPostInitializedGameObject
     private float[]? colliderVertexData;
     public float[] ColliderVertexData => colliderVertexData!;
     public bool NotInitialized { get; set; } = true;
-    public void InitFunc() => colliderVertexData ??= Parent.GetComponent<Mesh>().VertexData;
+    public void InitFunc()
+    {
+        colliderVertexData ??= Parent.GetComponent<Mesh>().VertexData;
+        addToPhysicsEngine();
+    }
 }

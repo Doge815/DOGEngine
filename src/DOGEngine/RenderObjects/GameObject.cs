@@ -74,7 +74,7 @@ public class GameObject
 
     public GameObject Parent { get; internal set; }
 
-    public GameObject Root => Parent == this ? this : Parent.Root;
+    //public GameObject Root => Parent == this ? this : Parent.Root;
 
     public GameObject(params GameObject[] newChildren)
     {

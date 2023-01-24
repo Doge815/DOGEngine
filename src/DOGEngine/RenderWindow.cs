@@ -92,8 +92,12 @@ public class Window
         if (window.KeyboardState.IsKeyDown(Keys.Escape))
             window.Close();
     };
-    public static Action<GameObject, Camera.Camera> BasicRender { get; } = (scene, camera) =>
+    public static Action<GameObject, Camera.Camera, FrameEventArgs> BasicRender { get; } = (scene, camera, args) =>
     {
+        if (scene.TryGetComponent(out Physics.Physics? physics))
+        {
+            physics!.Update((float)args.Time);
+        }
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         
         var view = camera.ViewMatrix;

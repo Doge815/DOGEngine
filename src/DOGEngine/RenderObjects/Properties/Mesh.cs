@@ -35,7 +35,7 @@ public partial class Mesh : GameObject, IPostInitializedGameObject
         foreach (IShaderAttribute attribute in shader.Attributes)
             interpretVertexDataFloat(shader, attribute, shader.Stride);
 
-        if (!Parent.TryGetComponent(out Collider _))
+        if (!Parent.TryGetComponent(out Collider _) && createCollider)
         {
             Parent.AddComponent(new Collider());
         }
