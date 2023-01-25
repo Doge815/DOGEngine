@@ -55,7 +55,7 @@ public class Collider : GameObject, IPostInitializedGameObject
             else if (PhysicsType.Type == PhysicsSimulationType.Static)
             {
                 if(Parent.Parent.TryGetComponent(out Transform? transform)) 
-                    physics!.Create(false, 0, transform!.TransformData, matrix => SetTranslation(transform, matrix));
+                    physics!.Create(false, 0, transform!.TransformData, null);
                 else
                     physics!.Create(false, 0, TransformData.Default, null);
             }

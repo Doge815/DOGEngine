@@ -44,56 +44,69 @@ void OnLoad(Window window)
         new(
             new Shading(shader3),
             new Mesh(Mesh.Cube, new Collider(PhysicsType.CreateActive(1))),
-    new Transform(new Vector3(-3, 1, -3), new Vector3(0, 45, 0), new Vector3(3, 1, 3))
+            new Transform(new Vector3(-6, 10, -3), new Vector3(0, 45, 0) )
         ),
-    new(
-        new Shading(shader1),
-        new Mesh(Mesh.Cube),
-        new Transform(new Vector3(-1, -1, -5)),
-        new Name("hitCube")
-    ),
-    new(
-        new Shading(shader4),
-        new Mesh(Mesh.Cube),
-        new Transform(new Vector3(1, 1, 10)),
-        new Lightning()
-    ),
-    new(
-        new Shading(shader5),
-        new Mesh(Mesh.Cube),
-        new Transform(new Vector3(10, 1, 1)),
-        new Lightning()
-    ),
-    new(
-        new Shading(shader3),
-        new Mesh(Mesh.Cube),
-        new Transform(new Vector3(0, 4, -5), new Vector3(0, 1, 0), new Vector3(2, 3, 4),
-            new Vector3(1, 0, 1)),
-        new Name("cube3")
-    ),
-    new(
-        new Shading(shader2),
-        new Mesh(Mesh.FromFile("Models/Pawn")),
-        new Collider("Models/PawnLowPoly"),
-        new Transform(new Vector3(0, -2, -7))
-    ),
-    new(
-        new Shading(shader6),
-        new Mesh(Mesh.FromFile("Models/Sphere")),
-        new Collider("Models/SphereLowPoly"),
-        new Transform(new Vector3(1, 1, -3))
-    ),
-    new (
-        new RenderText(font, "", new Vector2(100, -100), Corner.TopLeft, new Vector3(1, 1 ,0), 1),
-        new Name("fpsText")),
-    new (
-        new RenderText(font, "", new Vector2(100, -200), Corner.TopLeft, new Vector3(1, 1 ,0), 1),
-        new Name("hitText")),
-    new (
+        new(
+            new Shading(shader3),
+            new Mesh(Mesh.Cube, new Collider(PhysicsType.CreateActive(1))),
+            new Transform(new Vector3(-5.3f, 13, -3) )
+        ),
+        new(
+            new Shading(shader3),
+            new Mesh(Mesh.Cube, new Collider(PhysicsType.CreateActive(1))),
+            new Transform(new Vector3(-7, 13, -3.5f) )
+        ),
+        new(
+            new Shading(shader2),
+            new Mesh(Mesh.Cube, new Collider(PhysicsType.CreatePassive())),
+            new Transform(new Vector3(-6, -3, -3), null, new Vector3(5, 1, 5))
+        ),
+        new(
+            new Shading(shader1),
+            new Mesh(Mesh.Cube),
+            new Transform(new Vector3(-1, -1, -5)),
+            new Name("hitCube")
+        ),
+        new(
+            new Shading(shader4),
+            new Mesh(Mesh.Cube),
+            new Transform(new Vector3(1, 1, 10)),
+            new Lightning()
+        ),
+        new(
+            new Shading(shader5),
+            new Mesh(Mesh.Cube),
+            new Transform(new Vector3(10, 1, 1)),
+            new Lightning()
+        ),
+        new(
+            new Shading(shader3),
+            new Mesh(Mesh.Cube),
+            new Transform(new Vector3(0, 4, -5), new Vector3(0, 1, 0), new Vector3(2, 3, 4),
+                new Vector3(1, 0, 1)),
+            new Name("cube3")
+        ),
+        new(
+            new Shading(shader2),
+            new Mesh(Mesh.FromFile("Models/Pawn"), new Collider("Models/PawnLowPoly")),
+            new Transform(new Vector3(0, -2, -7))
+        ),
+        new(
+            new Shading(shader6),
+            new Mesh(Mesh.FromFile("Models/Sphere"), new Collider("Models/SphereLowPoly")),
+            new Transform(new Vector3(1, 1, -3))
+        ),
+        new (
+            new RenderText(font, "", new Vector2(100, -100), Corner.TopLeft, new Vector3(1, 1 ,0), 1),
+            new Name("fpsText")),
+        new (
+            new RenderText(font, "", new Vector2(100, -200), Corner.TopLeft, new Vector3(1, 1 ,0), 1),
+            new Name("hitText")),
+        new (
             new RenderText(font, "", new Vector2(100, 50), Corner.BottomLeft, new Vector3(1, 0 ,1), 1),
             new Name("rotationText"))
         
-        );
+    );
     
     scene.InitializeAll();
     window.GrabCursor(true);
@@ -108,6 +121,12 @@ void OnUpdate(Window window, FrameEventArgs frameEventArgs)
         {
             window.GrabCursor(true);
         }
+        if (window.MouseState.IsButtonPressed(MouseButton.Button1))
+        {
+            var x = scene.CastRay(camera.Position, camera.Front);
+            if (x is not null && x.Parent.Parent.TryGetComponent(out Name? name) && name!.ObjName == "hitCube")
+                hitCounter++;
+        }
     }
 
     if (window.IsFocused && !focused && window.MouseState.IsButtonPressed(MouseButton.Button1))
@@ -121,12 +140,6 @@ void OnUpdate(Window window, FrameEventArgs frameEventArgs)
         window.GrabCursor(false);
     }
     
-    if (window.MouseState.IsButtonPressed(MouseButton.Button1))
-    {
-        var x = scene.CastRay(camera.Position, camera.Front);
-        if (x is not null && x.Parent.TryGetComponent(out Name? name) && name!.ObjName == "hitCube")
-            hitCounter++;
-    }
 
     Transform? cube = null;
     scene.GetAllWithName("cube3").ForEach((obj =>
@@ -155,7 +168,6 @@ void OnUpdate(Window window, FrameEventArgs frameEventArgs)
     });
 
 }
-
 _ = new Window(800, 800, "TestApp",
     (window) =>
     {
@@ -165,7 +177,7 @@ _ = new Window(800, 800, "TestApp",
     (_, frameEventArgs) => Window.BasicRender(scene, camera, frameEventArgs),
     (window, frameEventArgs) =>
     {
-        Window.BasicUpdate(window);
+        Window.BasicUpdate(scene, window, frameEventArgs);
         OnUpdate(window, frameEventArgs);
     },
     (_, resizeArgs) => Window.BasicResize(resizeArgs, camera)

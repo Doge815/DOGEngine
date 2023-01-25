@@ -10,7 +10,7 @@ public static class Raycast
 {
     public static GameObject? CastRay(this GameObject scene, Vector3 origin, Vector3 direction)
     {
-        var threadLock = new object();
+        ReaderWriterLockSlim threadLock = new ReaderWriterLockSlim();
         float closest = float.MaxValue;
         GameObject? obj = null;
 
@@ -19,18 +19,22 @@ public static class Raycast
             if (MoellerTrumbore(origin, direction, tri, out var intersection))
             {
                 float distance = Vector3.Distance(intersection!.Value, origin);
-                lock (threadLock)
+                threadLock.EnterUpgradeableReadLock();
+                if (distance < closest)
                 {
+                    threadLock.EnterWriteLock();
                     if (distance < closest)
                     {
                         closest = distance;
                         obj = tri.owner;
                     }
-                    
+                    threadLock.ExitWriteLock();
                 }
+                threadLock.ExitUpgradeableReadLock();
             }
 
         }
+        
         Parallel.ForEach(scene.GetAllTriangles(), CheckTriangle);
         
         return obj;
@@ -40,7 +44,7 @@ public static class Raycast
     {
         foreach (Collider collider in scene.GetAllInChildren<Collider>())
         {
-            var model = Mesh.GetModel(collider);
+            var model = Mesh.GetModel(collider.Parent);
             var vertexData = collider.ColliderVertexData;
             for (int i = 0; i < vertexData.Length; i += 9)
             {

@@ -23,7 +23,7 @@ public class Physics : GameObject
         world.StepSimulation(time);
         foreach (var o in world.CollisionObjectArray)
         {
-            if(o is RigidBody { UserObject: Action<Matrix> action } collisionObject)
+            if (o is RigidBody { UserObject: Action<Matrix> action } collisionObject)
                 action(collisionObject.MotionState.WorldTransform);
         }
     }
