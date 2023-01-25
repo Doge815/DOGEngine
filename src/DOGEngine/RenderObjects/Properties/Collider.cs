@@ -41,20 +41,23 @@ public class Collider : GameObject, IPostInitializedGameObject
     {
         void SetTranslation(Transform transform, Matrix translation)
         {
-            transform.Model = translation.Convert();
+            transform.TransformData.SetModel(translation.Convert(), false, true, true);
         }
         if (Root.TryGetComponent(out Physics.Physics? physics))
         {
             if (PhysicsType.Type == PhysicsSimulationType.Dynamic)
             {
                 if(Parent.Parent.TryGetComponent(out Transform? transform)) 
-                    physics!.CreateDynamic(PhysicsType.Mass, transform!.Position.Convert(), matrix => SetTranslation(transform!, matrix));
+                    physics!.Create(true, PhysicsType.Mass, transform!.TransformData, matrix => SetTranslation(transform, matrix));
                 else
-                    physics!.CreateDynamic(PhysicsType.Mass, Vector3.Zero, null);
+                    physics!.Create(true, PhysicsType.Mass, TransformData.Default, null);
             }
             else if (PhysicsType.Type == PhysicsSimulationType.Static)
             {
-                //Todo
+                if(Parent.Parent.TryGetComponent(out Transform? transform)) 
+                    physics!.Create(false, 0, transform!.TransformData, matrix => SetTranslation(transform, matrix));
+                else
+                    physics!.Create(false, 0, TransformData.Default, null);
             }
         }
     }

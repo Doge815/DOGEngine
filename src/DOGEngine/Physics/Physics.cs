@@ -1,6 +1,7 @@
 using BulletSharp;
 using BulletSharp.Math;
 using DOGEngine.RenderObjects;
+using DOGEngine.RenderObjects.Properties;
 using Vector3 = BulletSharp.Math.Vector3;
 
 namespace DOGEngine.Physics;
@@ -27,14 +28,18 @@ public class Physics : GameObject
         }
     }
 
-    public void CreateDynamic(float mass, Vector3 position, Action<Matrix>? setTrans)
+    internal void Create(bool dynamic, float mass, TransformData translation, Action<Matrix>? setTrans)
     {
-        var shape = new BoxShape(0.5f);
-        var inertia = shape.CalculateLocalInertia(mass);
-        var bodyInfo = new RigidBodyConstructionInfo(mass, null, shape, inertia);
-        bodyInfo.MotionState = new DefaultMotionState(Matrix.Translation(position));
+        var shape = new BoxShape((translation.Scale*0.5f).Convert());
+        RigidBodyConstructionInfo bodyInfo = dynamic
+            ? new RigidBodyConstructionInfo(mass, null, shape, shape.CalculateLocalInertia(mass))
+            : new RigidBodyConstructionInfo(mass, null, shape){StartWorldTransform = translation.CreateSelectedModelMatrix(false, true, true, true).Convert()};
+        if(dynamic) 
+            bodyInfo.MotionState = new DefaultMotionState(translation.CreateSelectedModelMatrix(false, true, true, true).Convert());
+        
         var body = new RigidBody(bodyInfo);
         world.AddRigidBody(body);
         body.UserObject = setTrans;
+        bodyInfo.Dispose();
     }
 }

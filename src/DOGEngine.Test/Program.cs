@@ -44,7 +44,7 @@ void OnLoad(Window window)
         new(
             new Shading(shader3),
             new Mesh(Mesh.Cube, new Collider(PhysicsType.CreateActive(1))),
-    new Transform(new Vector3(-3, 1, -3))
+    new Transform(new Vector3(-3, 1, -3), new Vector3(0, 45, 0), new Vector3(3, 1, 3))
         ),
     new(
         new Shading(shader1),

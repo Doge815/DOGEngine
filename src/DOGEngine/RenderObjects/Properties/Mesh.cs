@@ -67,9 +67,7 @@ public partial class Mesh : GameObject, IPostInitializedGameObject
         GL.DrawArrays(PrimitiveType.Triangles, 0, triangles);
     }
 
-    private static readonly Matrix4 defaultModel =
-        Transform.CreateModelMatrix(Vector3.One, Vector3.Zero, Vector3.Zero, Vector3.Zero);
-    internal static Matrix4 GetModel(GameObject obj) => obj.Parent.TryGetComponent(out Transform? transform) ? transform!.Model : defaultModel;
+    internal static Matrix4 GetModel(GameObject obj) => obj.Parent.TryGetComponent(out Transform? transform) ? transform!.Model : TransformData.Default.Model;
 
     private void interpretVertexData(Shader.Shader shader, string attribute, int size, VertexAttribPointerType type, int stride, int offset)
     {
