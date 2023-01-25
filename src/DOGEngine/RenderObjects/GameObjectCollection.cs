@@ -5,18 +5,9 @@ public class GameObjectCollection : GameObject
     private readonly List<GameObject> collection;
     public IReadOnlyCollection<GameObject> Collection => collection.AsReadOnly();
     
-    public GameObjectCollection(params GameObject[] newChildren)
+    public GameObjectCollection()
     {
         collection = new List<GameObject>();
-        CollectionAddComponents(newChildren);
-    }
-
-    public void CollectionAddComponent(GameObject child)
-    {
-        collection.Add(child);
-        child.Parent = this;
-        if(child is IPostInitializedGameObject initialize)
-            initialize.Initialize();
     }
 
     public void CollectionAddComponents(params GameObject[] children)
@@ -25,15 +16,19 @@ public class GameObjectCollection : GameObject
         {
             collection.Add(child);
             child.Parent = this;
+            child.initializeChildren = initializeChildren;
         }
-        foreach (var child in children)
-            if(child is IPostInitializedGameObject initialize)
-                initialize.Initialize();
+        if(initializeChildren)
+            foreach (var child in children)
+                if(child is IPostInitializedGameObject initialize) 
+                    initialize.Initialize();
     }
 
 
     public override IEnumerable<T> GetAllInChildren<T>()
     {
+        if (this is T o) yield return o;
+        
         foreach (var child in base.GetAllInChildren<T>())
             yield return child;
 

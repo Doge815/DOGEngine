@@ -41,11 +41,13 @@ public class GameObject
 
     public virtual IEnumerable<T> GetAllInChildren<T>() where T : GameObject
     {
+        if (this is T o) yield return o;
+        
         foreach (GameObject child in Children)
-        foreach (var childComponent in child.GetAllInChildren<T>())
-            yield return childComponent;
-
-        if (GetType() == typeof(T)) yield return this as T ?? throw new SystemException("Oof");
+        {
+            foreach (var childComponent in child.GetAllInChildren<T>())
+                yield return childComponent;
+        }
     }
 
     public virtual IEnumerable<GameObject> GetAllWithName(string name)
@@ -62,20 +64,34 @@ public class GameObject
     {
         if (!children.TryAdd(gameObject.GetType(), gameObject)) throw new ArgumentException("Can't add component");
         gameObject.Parent = this;
-        if(gameObject is IPostInitializedGameObject initialize) initialize.Initialize();
+        gameObject.initializeChildren = initializeChildren;
+        if(initializeChildren && gameObject is IPostInitializedGameObject initialize) initialize.Initialize();
     }
 
     public bool TryAddComponent(GameObject gameObject)
     {
-        bool success = children.TryAdd(gameObject.GetType(), gameObject);
-        if(success && gameObject is IPostInitializedGameObject initialize) initialize.Initialize();
-        return success;
+        if (!children.TryAdd(gameObject.GetType(), gameObject)) return false;
+        gameObject.Parent = this;
+        gameObject.initializeChildren = initializeChildren;
+        if(initializeChildren && gameObject is IPostInitializedGameObject initialize) initialize.Initialize();
+        return true;
     }
 
     public GameObject Parent { get; internal set; }
 
-    //public GameObject Root => Parent == this ? this : Parent.Root;
+    public GameObject Root => Parent == this ? this : Parent.Root;
 
+    internal bool initializeChildren { get; set; }
+
+    public void InitializeAll()
+    {
+        foreach (var obj in GetAllInChildren<GameObject>())
+        {
+            obj.initializeChildren = true;
+            if (obj is IPostInitializedGameObject initialize)
+                initialize.Initialize();
+        }
+    }
     public GameObject(params GameObject[] newChildren)
     {
         Parent = this;
@@ -84,11 +100,7 @@ public class GameObject
         {
             if (!children.TryAdd(child.GetType(), child)) throw new ArgumentException("Can't add component");
             child.Parent = this;
-        }
-        foreach (var child in newChildren)
-        {
-            if(child is IPostInitializedGameObject initialize)
-                initialize.Initialize();
+            child.initializeChildren = initializeChildren;
         }
     }
 }

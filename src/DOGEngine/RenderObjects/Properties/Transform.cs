@@ -2,7 +2,7 @@ namespace DOGEngine.RenderObjects.Properties;
 
 public class Transform : GameObject
 {
-    private bool modelUpdate = true;
+    private bool modelUpdate;
     private Vector3 _position;
     private Vector3 _orientation;
     private Vector3 _scale;
@@ -67,6 +67,7 @@ public class Transform : GameObject
         Orientation = orientation ?? Vector3.Zero;
         Scale = scale ?? Vector3.One;
         OrientationOffset = orientationOffset ?? Vector3.Zero;
+        modelUpdate = true;
     }
 
     private  Matrix4 CreateModelMatrix() => CreateModelMatrix(Scale, OrientationOffset, Orientation, Position);

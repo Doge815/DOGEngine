@@ -47,10 +47,14 @@ public class Collider : GameObject, IPostInitializedGameObject
         {
             if (PhysicsType.Type == PhysicsSimulationType.Dynamic)
             {
-                if(Parent.TryGetComponent(out Transform? transform)) 
+                if(Parent.Parent.TryGetComponent(out Transform? transform)) 
                     physics!.CreateDynamic(PhysicsType.Mass, transform!.Position.Convert(), matrix => SetTranslation(transform!, matrix));
                 else
                     physics!.CreateDynamic(PhysicsType.Mass, Vector3.Zero, null);
+            }
+            else if (PhysicsType.Type == PhysicsSimulationType.Static)
+            {
+                //Todo
             }
         }
     }
@@ -60,7 +64,11 @@ public class Collider : GameObject, IPostInitializedGameObject
     public bool NotInitialized { get; set; } = true;
     public void InitFunc()
     {
-        colliderVertexData ??= Parent.GetComponent<Mesh>().VertexData;
+        if (colliderVertexData is null)
+        {
+            if (Parent is Mesh mesh) colliderVertexData = mesh.VertexData;
+            else throw new AggregateException("Parent must be mesh or vertex data must be supplied");
+        }
         addToPhysicsEngine();
     }
 }

@@ -8,12 +8,19 @@ public partial class Mesh : GameObject, IPostInitializedGameObject
     private int triangles;
 
     private readonly VertexDataBundle tempData;
-    private bool createCollider;
+    private readonly bool createCollider;
     public Mesh(VertexDataBundle data, bool createColliderIfNotExistent = true)
     {
         tempData = data;
         VAO = -1;
         createCollider = createColliderIfNotExistent;
+    }
+
+    public Mesh(VertexDataBundle data, Collider collider) :base(collider)
+    {
+        tempData = data;
+        VAO = -1;
+        
     }
     
     internal float[] VertexData => tempData.Data[typeof(VertexShaderAttribute)];
@@ -35,9 +42,9 @@ public partial class Mesh : GameObject, IPostInitializedGameObject
         foreach (IShaderAttribute attribute in shader.Attributes)
             interpretVertexDataFloat(shader, attribute, shader.Stride);
 
-        if (!Parent.TryGetComponent(out Collider _) && createCollider)
+        if (!TryGetComponent(out Collider _) && createCollider)
         {
-            Parent.AddComponent(new Collider());
+            AddComponent(new Collider());
         }
     }
 
