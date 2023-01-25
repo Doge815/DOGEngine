@@ -27,7 +27,7 @@ public class Collider : GameObject, IPostInitializedGameObject
     public PhysicsType PhysicsType { get; }
     public Collider(string file, PhysicsType? physicsType = null)
     {
-        colliderVertexData = Mesh.FromFile(file, true).Data[typeof(VertexShaderAttribute)];
+        colliderVertexData = Mesh.TriangleMesh.FromFile(file, true).Data[typeof(VertexShaderAttribute)];
         PhysicsType = physicsType ?? PhysicsType.CreateNone();
     }
 
@@ -69,7 +69,7 @@ public class Collider : GameObject, IPostInitializedGameObject
     {
         if (colliderVertexData is null)
         {
-            if (Parent is Mesh mesh) colliderVertexData = mesh.VertexData;
+            if (Parent is Mesh.Mesh mesh) colliderVertexData = mesh.MeshData.VertexData;
             else throw new AggregateException("Parent must be mesh or vertex data must be supplied");
         }
         addToPhysicsEngine();

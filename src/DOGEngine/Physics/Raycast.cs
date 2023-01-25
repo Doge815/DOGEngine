@@ -1,5 +1,6 @@
 using DOGEngine.RenderObjects;
 using DOGEngine.RenderObjects.Properties;
+using DOGEngine.RenderObjects.Properties.Mesh;
 using DOGEngine.Shader;
 
 namespace DOGEngine.Physics;

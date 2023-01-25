@@ -3,6 +3,7 @@ using DOGEngine.Camera;
 using DOGEngine.Physics;
 using DOGEngine.RenderObjects;
 using DOGEngine.RenderObjects.Properties;
+using DOGEngine.RenderObjects.Properties.Mesh;
 using DOGEngine.RenderObjects.Text;
 using DOGEngine.Shader;
 using DOGEngine.Texture;
@@ -30,6 +31,8 @@ void OnLoad(Window window)
     var shader5 = new PlainColorShader(new Vector3(0.8f, 0.2f, 0.2f));
     var shader6 = new PbrShader(metalTexture);
 
+    var cubeMesh = new TriangleMesh(TriangleMesh.Cube);
+
     var font = new Font(Font.DejaVuSans, 50);
 
     scene.AddComponent(new Physics());
@@ -37,63 +40,63 @@ void OnLoad(Window window)
     scene.CollectionAddComponents(
         new(
             new Shading(shader1),
-            new Mesh(Mesh.Triangle),
+            new Mesh(TriangleMesh.Triangle),
             new Transform(new Vector3(0, 0, 5)),
             new Name("testTriangle")
         ),
         new(
             new Shading(shader3),
-            new Mesh(Mesh.Cube, new Collider(PhysicsType.CreateActive(1))),
-            new Transform(new Vector3(-6, 10, -3), new Vector3(0, 45, 0) )
+            new Mesh(cubeMesh, new Collider(PhysicsType.CreateActive(1))),
+            new Transform(new Vector3(-6, 8, -3), new Vector3(0, 45, 0), new Vector3(2, 1, 2) )
         ),
         new(
             new Shading(shader3),
-            new Mesh(Mesh.Cube, new Collider(PhysicsType.CreateActive(1))),
+            new Mesh(cubeMesh, new Collider(PhysicsType.CreateActive(1))),
             new Transform(new Vector3(-5.3f, 13, -3) )
         ),
         new(
             new Shading(shader3),
-            new Mesh(Mesh.Cube, new Collider(PhysicsType.CreateActive(1))),
+            new Mesh(cubeMesh, new Collider(PhysicsType.CreateActive(1))),
             new Transform(new Vector3(-7, 13, -3.5f) )
         ),
         new(
             new Shading(shader2),
-            new Mesh(Mesh.Cube, new Collider(PhysicsType.CreatePassive())),
+            new Mesh(cubeMesh, new Collider(PhysicsType.CreatePassive())),
             new Transform(new Vector3(-6, -3, -3), null, new Vector3(5, 1, 5))
         ),
         new(
             new Shading(shader1),
-            new Mesh(Mesh.Cube),
+            new Mesh(cubeMesh),
             new Transform(new Vector3(-1, -1, -5)),
             new Name("hitCube")
         ),
         new(
             new Shading(shader4),
-            new Mesh(Mesh.Cube),
+            new Mesh(cubeMesh),
             new Transform(new Vector3(1, 1, 10)),
             new Lightning()
         ),
         new(
             new Shading(shader5),
-            new Mesh(Mesh.Cube),
+            new Mesh(cubeMesh),
             new Transform(new Vector3(10, 1, 1)),
             new Lightning()
         ),
         new(
             new Shading(shader3),
-            new Mesh(Mesh.Cube),
+            new Mesh(cubeMesh),
             new Transform(new Vector3(0, 4, -5), new Vector3(0, 1, 0), new Vector3(2, 3, 4),
                 new Vector3(1, 0, 1)),
             new Name("cube3")
         ),
         new(
             new Shading(shader2),
-            new Mesh(Mesh.FromFile("Models/Pawn"), new Collider("Models/PawnLowPoly")),
+            new Mesh(TriangleMesh.FromFile("Models/Pawn"), new Collider("Models/PawnLowPoly")),
             new Transform(new Vector3(0, -2, -7))
         ),
         new(
             new Shading(shader6),
-            new Mesh(Mesh.FromFile("Models/Sphere"), new Collider("Models/SphereLowPoly")),
+            new Mesh(TriangleMesh.FromFile("Models/Sphere"), new Collider("Models/SphereLowPoly")),
             new Transform(new Vector3(1, 1, -3))
         ),
         new (

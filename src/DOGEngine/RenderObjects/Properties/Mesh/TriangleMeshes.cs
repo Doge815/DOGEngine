@@ -1,8 +1,8 @@
 using DOGEngine.Shader;
 
-namespace DOGEngine.RenderObjects.Properties;
+namespace DOGEngine.RenderObjects.Properties.Mesh;
 
-public partial class Mesh
+public partial class TriangleMesh
 {
     public static VertexDataBundle FromFile(string filePath) => FromFile(filePath, false);
     internal static VertexDataBundle FromFile(string filePath, bool verticesOnly)
@@ -54,7 +54,7 @@ public partial class Mesh
         return new VertexDataBundle(data, data[typeof(VertexShaderAttribute)].Length / 3);
     }
 
-    private  static void SaveAgr(in VertexDataBundle data, string filePath)
+    private static void SaveAgr(in VertexDataBundle data, string filePath)
     {
         string GetName(Type t)
         {
@@ -232,6 +232,7 @@ public partial class Mesh
         return new VertexDataBundle(data, faces.Count * 3);
         
     }
+    
     public static readonly VertexDataBundle Triangle = new VertexDataBundle(new Dictionary<Type, float[]>()
     {
         { typeof(VertexShaderAttribute), new[]
