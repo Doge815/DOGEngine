@@ -110,6 +110,22 @@ void OnLoad(Window window)
             new Name("rotationText"))
         
     );
+
+    const int count = 10;
+    for (int x = 0; x < count; x++)
+    {
+        for (int y = 0; y < count; y++)
+        {
+            for (int z = 0; z < count; z++)
+            {
+                GameObject cube = new (
+                    new Shading(shader3),
+                    new Mesh(cubeMesh, new Collider(PhysicsType.CreateActive(1))),
+                    new Transform(new Vector3(10 + x, 20 + y, -10 - z)));
+                scene.CollectionAddComponents(cube);
+            }
+        }
+    }
     
     scene.InitializeAll();
     window.GrabCursor(true);
