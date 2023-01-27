@@ -62,7 +62,7 @@ void OnLoad(Window window)
         new(
             new Shading(shader2),
             new Mesh(cubeMesh, new Collider(PhysicsType.CreatePassive())),
-            new Transform(new Vector3(-6, -3, -3), null, new Vector3(5, 1, 5))
+            new Transform(new Vector3(0, -10, 0), null, new Vector3(50, 1, 50))
         ),
         new(
             new Shading(shader1),

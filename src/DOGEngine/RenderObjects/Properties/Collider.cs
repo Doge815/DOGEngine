@@ -1,5 +1,8 @@
+using BulletSharp;
 using BulletSharp.Math;
+using DOGEngine.RenderObjects.Properties.Mesh;
 using DOGEngine.Shader;
+using TriangleMesh = BulletSharp.TriangleMesh;
 using Vector3 = BulletSharp.Math.Vector3;
 
 namespace DOGEngine.RenderObjects.Properties;
@@ -22,47 +25,62 @@ public struct PhysicsType //I want rust enums with values
 }
 
 
+public enum ColliderType
+{
+    Box,
+    Mesh,
+}
 public class Collider : GameObject, IPostInitializedGameObject
 {
     public PhysicsType PhysicsType { get; }
-    public Collider(string file, PhysicsType? physicsType = null)
+    public Collider(string file, PhysicsType? physicsType = null, params IColliderWrapper[] colliders)
     {
         colliderVertexData = Mesh.TriangleMesh.FromFile(file, true).Data[typeof(VertexShaderAttribute)];
         PhysicsType = physicsType ?? PhysicsType.CreateNone();
+        physicsColliders = colliders;
+
     }
 
-    public Collider(PhysicsType? physicsType = null) //use the mesh as the collider
+    public Collider(PhysicsType? physicsType = null, params IColliderWrapper[] colliders) //use the mesh as the collider
     {
         colliderVertexData = null;
         PhysicsType = physicsType ?? PhysicsType.CreateNone();
+        physicsColliders = colliders;
     }
 
     private void addToPhysicsEngine()
     {
-        void SetTranslation(Transform transform, Matrix translation)
+        void SetTranslation(Transform transform, Matrix translation) => transform.TransformData.SetModel(translation.Convert(), false, true, true);
+
+        CollisionShape CreateCollider()
         {
-            transform.TransformData.SetModel(translation.Convert(), false, true, true);
+            Parent.Parent.TryGetComponent(out Transform? transform);
+            var scale = (transform?.TransformData ?? TransformData.Default).Scale;
+            if (physicsColliders.Length == 0)
+                return IColliderWrapper.Combine(scale, new MeshCollider(ColliderVertexData));
+            return IColliderWrapper.Combine(scale, physicsColliders);
         }
         if (Root.TryGetComponent(out Physics.Physics? physics))
         {
             if (PhysicsType.Type == PhysicsSimulationType.Dynamic)
             {
                 if(Parent.Parent.TryGetComponent(out Transform? transform)) 
-                    physics!.Create(true, PhysicsType.Mass, transform!.TransformData, matrix => SetTranslation(transform, matrix));
+                    physics!.Create(CreateCollider(), true, PhysicsType.Mass, transform!.TransformData, matrix => SetTranslation(transform, matrix));
                 else
-                    physics!.Create(true, PhysicsType.Mass, TransformData.Default, null);
+                    physics!.Create(CreateCollider(), true, PhysicsType.Mass, TransformData.Default, null);
             }
             else if (PhysicsType.Type == PhysicsSimulationType.Static)
             {
                 if(Parent.Parent.TryGetComponent(out Transform? transform)) 
-                    physics!.Create(false, 0, transform!.TransformData, null);
+                    physics!.Create(CreateCollider(), false, 0, transform!.TransformData, null);
                 else
-                    physics!.Create(false, 0, TransformData.Default, null);
+                    physics!.Create(CreateCollider(), false, 0, TransformData.Default, null);
             }
         }
     }
 
     private float[]? colliderVertexData;
+    private readonly IColliderWrapper[] physicsColliders;
     public float[] ColliderVertexData => colliderVertexData!;
     public bool NotInitialized { get; set; } = true;
     public void InitFunc()

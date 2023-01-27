@@ -28,9 +28,8 @@ public class Physics : GameObject
         }
     }
 
-    internal void Create(bool dynamic, float mass, TransformData translation, Action<Matrix>? setTrans)
+    internal void Create(CollisionShape shape, bool dynamic, float mass, TransformData translation, Action<Matrix>? setTrans)
     {
-        var shape = new BoxShape((translation.Scale*0.5f).Convert());
         RigidBodyConstructionInfo bodyInfo = dynamic
             ? new RigidBodyConstructionInfo(mass, null, shape, shape.CalculateLocalInertia(mass))
             : new RigidBodyConstructionInfo(mass, null, shape){StartWorldTransform = translation.CreateSelectedModelMatrix(false, true, true, true).Convert()};
