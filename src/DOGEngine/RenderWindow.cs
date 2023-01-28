@@ -102,8 +102,7 @@ public class Window
         var view = camera.ViewMatrix;
         var projection = camera.ProjectionMatrix;
 
-        var skyBoxes = scene.GetAllInChildren<Skybox>().ToArray();
-        if(skyBoxes.Any()) skyBoxes.First().Draw(view, projection);
+        scene.GetAllInChildren<Skybox>().FirstOrDefault()?.Draw(view, projection);
 
         List<Lightning> lights = new List<Lightning>();
         foreach (Lightning light in scene.GetAllInChildren<Lightning>())

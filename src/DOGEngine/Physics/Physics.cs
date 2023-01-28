@@ -37,9 +37,9 @@ public class Physics : GameObject
     {
         RigidBodyConstructionInfo bodyInfo = dynamic
             ? new RigidBodyConstructionInfo(mass, null, shape, shape.CalculateLocalInertia(mass))
-            : new RigidBodyConstructionInfo(mass, null, shape){StartWorldTransform = translation.CreateSelectedModelMatrix(false, true, true, true).Convert()};
+            : new RigidBodyConstructionInfo(mass, null, shape){StartWorldTransform = translation.CreateSelectedModelMatrix(false).Convert()};
         if(dynamic) 
-            bodyInfo.MotionState = new DefaultMotionState(translation.CreateSelectedModelMatrix(false, true, true, true).Convert());
+            bodyInfo.MotionState = new DefaultMotionState(translation.CreateSelectedModelMatrix(false).Convert());
         
         var body = new RigidBody(bodyInfo);
         world.AddRigidBody(body);

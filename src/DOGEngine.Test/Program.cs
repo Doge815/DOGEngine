@@ -166,47 +166,39 @@ void OnUpdate(Window window, FrameEventArgs frameEventArgs)
         focused = false;
         window.GrabCursor(false);
     }
-    
 
-    Transform? cube = null;
-    scene.GetAllWithName("cube3").ForEach((obj =>
+
+    if (scene.GetAllWithName("cube3").FirstOrDefault()?.TryGetComponent(out Transform? transform) is not null)
     {
-        if (obj.TryGetComponent(out Transform? transform)) cube = transform!;
-    }));
-    if (cube is not null)
-    {
-        cube.Orientation = cube.Orientation with{Y = (cube.Orientation.Y + 60 * (float)frameEventArgs.Time)%360};
-        scene.GetAllWithName("rotationText").ForEach(obj =>
+        transform!.Orientation = transform.Orientation with
         {
-            if (obj.TryGetComponent(out RenderText? renderText))
-                renderText!.Text = $"Rotation: {cube.Orientation.Y:F0}°";
-        });
+            Y = (transform.Orientation.Y + 60 * (float)frameEventArgs.Time) % 360
+        };
+        {
+            if (scene.GetAllWithName("rotationText").FirstOrDefault()
+                    ?.TryGetComponent(out RenderText? renderText) is not null)
+                renderText!.Text = $"Rotation: {transform.Orientation.Y:F0}°";
+        }
     }
-    
-    scene.GetAllWithName("fpsText").ForEach(obj =>
-    {
-        if (obj.TryGetComponent(out RenderText? renderText))
-            renderText!.Text = $"FPS: {1/frameEventArgs.Time:F2}";
-    });
-    scene.GetAllWithName("hitText").ForEach(obj =>
-    {
-        if (obj.TryGetComponent(out RenderText? renderText))
-            renderText!.Text = $"Cube hits: {hitCounter}";
-    });
 
-}
-_ = new Window(800, 800, "TestApp",
-    (window) =>
-    {
-        Window.BasicLoad();
-        OnLoad(window);
-    },
-    (_, frameEventArgs) => Window.BasicRender(scene, camera, frameEventArgs),
-    (window, frameEventArgs) =>
-    {
-        Window.BasicUpdate(scene, window, frameEventArgs);
-        OnUpdate(window, frameEventArgs);
-    },
-    (_, resizeArgs) => Window.BasicResize(resizeArgs, camera)
+    {if (scene.GetAllWithName("fpsText").FirstOrDefault()?.TryGetComponent(out RenderText? renderText) is not null)
+            renderText!.Text = $"FPS: {1/frameEventArgs.Time:F2}";}
 
-);
+        {if (scene.GetAllWithName("hitText").FirstOrDefault()?.TryGetComponent(out RenderText? renderText) is not null)
+            renderText!.Text = $"Cube hits: {hitCounter}";}
+    }
+    _ = new Window(800, 800, "TestApp",
+        (window) =>
+        {
+            Window.BasicLoad();
+            OnLoad(window);
+        },
+        (_, frameEventArgs) => Window.BasicRender(scene, camera, frameEventArgs),
+        (window, frameEventArgs) =>
+        {
+            Window.BasicUpdate(scene, window, frameEventArgs);
+            OnUpdate(window, frameEventArgs);
+        },
+        (_, resizeArgs) => Window.BasicResize(resizeArgs, camera)
+
+    );

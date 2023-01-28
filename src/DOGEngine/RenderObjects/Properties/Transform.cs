@@ -77,7 +77,7 @@ internal struct TransformData
     
     public Matrix4 CreateModelMatrix() => CreateModelMatrix(Scale, OrientationOffset, Orientation, Position);
 
-    public Matrix4 CreateSelectedModelMatrix(bool scale, bool orientationOffset, bool orientation, bool position) =>
+    public Matrix4 CreateSelectedModelMatrix(bool scale = true, bool orientationOffset = true, bool orientation = true, bool position = true) =>
         CreateModelMatrix(
             scale ? Scale : Vector3.One,
             orientationOffset ? OrientationOffset : Vector3.Zero,
@@ -104,37 +104,40 @@ internal struct TransformData
 }
 public class Transform : GameObject
 {
-
     internal TransformData TransformData;
     public Vector3 Position
     {
         get => TransformData.Position;
-        set => TransformData.Position = value;
+        set { TransformData.Position = value; TransformChanged?.Invoke(this.TransformData); }
     }
-    
+
     public Vector3  Orientation
     {
         get => TransformData.Orientation;
-        set => TransformData.Orientation = value;
+        set { TransformData.Orientation = value; TransformChanged?.Invoke(this.TransformData); }
     }
-    
+
     public Vector3  Scale
     {
         get => TransformData.Scale;
-        set => TransformData.Scale = value;
+        set { TransformData.Scale = value; TransformChanged?.Invoke(this.TransformData); }
     }
-    
+
     public Vector3  OrientationOffset
     {
         get => TransformData.OrientationOffset;
-        set => TransformData.OrientationOffset = value;
+        set { TransformData.OrientationOffset = value; TransformChanged?.Invoke(this.TransformData); }
     }
-    
+
     public Matrix4 Model
     {
         get => TransformData.Model;
-        set => TransformData.Model = value;
+        set { TransformData.Model = value; TransformChanged?.Invoke(this.TransformData); }
     }
+
+    internal delegate void TransformChangedHandler(TransformData transform);
+
+    internal event TransformChangedHandler? TransformChanged;
     
     public Transform(Vector3? position = null, Vector3? orientation = null, Vector3? scale = null,
         Vector3? orientationOffset = null)

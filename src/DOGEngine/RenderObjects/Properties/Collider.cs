@@ -63,6 +63,19 @@ public class Collider : GameObject, IPostInitializedGameObject, IDeletableGameOb
             physicsObj.Dispose();
             physicsObj = null;
         }
+
+        Parent.Parent.TryGetComponent(out Transform? transform);
+        if (transform is not null)
+        {
+            try
+            {
+                transform.TransformChanged -= updateColliderPosition;
+            }
+            catch
+            {
+                //new transform ig, idk
+            }
+        }
     }
     public void EnablePhysics()
     {
@@ -79,11 +92,37 @@ public class Collider : GameObject, IPostInitializedGameObject, IDeletableGameOb
         }
         if (Root.TryGetComponent(out Physics.Physics? physics))
         {
-            if (PhysicsType.Type == PhysicsSimulationType.Dynamic)
-                physicsObj = Parent.Parent.TryGetComponent(out Transform? transform) ? physics!.Create(CreateCollider(), true, PhysicsType.Mass, transform!.TransformData, (this, matrix => SetTranslation(transform, matrix))) : physics!.Create(CreateCollider(), true, PhysicsType.Mass, TransformData.Default, (this, null));
+            if (PhysicsType.Type == PhysicsSimulationType.Dynamic) 
+            {
+                if (Parent.Parent.TryGetComponent(out Transform? transform))
+                {
+                    physicsObj = physics!.Create(CreateCollider(), true, PhysicsType.Mass, transform!.TransformData,
+                        (this, matrix => SetTranslation(transform, matrix)));
+                    transform.TransformChanged += updateColliderPosition;
+                }
+                else
+                    physicsObj = physics!.Create(CreateCollider(), true, PhysicsType.Mass, TransformData.Default,
+                        (this, null));
+            }
             else if (PhysicsType.Type == PhysicsSimulationType.Static)
-                physicsObj = physics!.Create(CreateCollider(), false, 0, Parent.Parent.TryGetComponent(out Transform? transform) ? transform!.TransformData : TransformData.Default, (this, null));
+            {
+                if (Parent.Parent.TryGetComponent(out Transform? transform))
+                {
+                    physicsObj = physics!.Create(CreateCollider(), false, 0, transform!.TransformData, (this, null));
+                    transform.TransformChanged += updateColliderPosition;
+                }
+                else
+                {
+                    physicsObj = physics!.Create(CreateCollider(), false, 0, TransformData.Default, (this, null));
+                }
+            }
         }
+    }
+
+    private void updateColliderPosition(TransformData data)
+    {
+        if (physicsObj is RigidBody rigidBody)
+            rigidBody.MotionState.WorldTransform = data.CreateSelectedModelMatrix(false).Convert();
     }
 
     private float[]? colliderVertexData;
