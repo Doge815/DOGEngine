@@ -1,6 +1,6 @@
 using BulletSharp;
 
-namespace DOGEngine.RenderObjects.Properties.Mesh;
+namespace DOGEngine.RenderObjects.Properties.Mesh.Collider;
 
 public interface IColliderWrapper
 {
@@ -52,10 +52,36 @@ public class CubeCollider : IColliderWrapper
     }
 }
 
+public class CapsuleCollider : IColliderWrapper
+{
+    public Matrix4? Transform { get; }
+    private readonly float _radius;
+    private readonly float _height;
+    public CapsuleCollider(float radius, float height, Vector3? position = null, Vector3? orientation = null)
+    {
+        _radius = radius;
+        _height = height;
+        if (position is not null || orientation is not null)
+        {
+            Transform = Matrix4.Identity;
+            if (position is not null)
+                Transform *= Matrix4.CreateTranslation(position.Value);
+            if (orientation is not null)
+                Transform *= Matrix4.CreateFromQuaternion(new Quaternion(orientation.Value * MathF.PI / 180f));
+        }
+        else
+            Transform = null;
+    }
+
+    public CollisionShape GetShape(Vector3 scale) {
+        return new CapsuleShape(_radius, _height);
+    }
+}
+
 public class MeshCollider : IColliderWrapper
 {
     public Matrix4? Transform { get; }
-    private float[] verices;
+    private readonly float[] verices;
     public MeshCollider(float[] vertexData, Vector3? position = null, Vector3? orientation = null)
     {
         verices = vertexData;

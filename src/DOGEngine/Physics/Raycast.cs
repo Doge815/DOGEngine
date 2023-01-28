@@ -1,6 +1,7 @@
 using DOGEngine.RenderObjects;
 using DOGEngine.RenderObjects.Properties;
 using DOGEngine.RenderObjects.Properties.Mesh;
+using DOGEngine.RenderObjects.Properties.Mesh.Collider;
 using DOGEngine.Shader;
 
 namespace DOGEngine.Physics;
@@ -47,6 +48,7 @@ public static class Raycast
         {
             var model = Mesh.GetModel(collider.Parent);
             var vertexData = collider.ColliderVertexData;
+            if (vertexData is null) continue;
             for (int i = 0; i < vertexData.Length; i += 9)
             {
                 var vertex1 = new Vector4(vertexData[i + 0], vertexData[i + 1], vertexData[i + 2], 1);

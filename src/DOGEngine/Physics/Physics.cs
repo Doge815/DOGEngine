@@ -2,6 +2,7 @@ using BulletSharp;
 using BulletSharp.Math;
 using DOGEngine.RenderObjects;
 using DOGEngine.RenderObjects.Properties;
+using DOGEngine.RenderObjects.Properties.Mesh.Collider;
 using Vector3 = BulletSharp.Math.Vector3;
 
 namespace DOGEngine.Physics;
@@ -33,7 +34,7 @@ public class Physics : GameObject
         world.RemoveCollisionObject(obj);
     }
 
-    internal RigidBody Create(CollisionShape shape, bool dynamic, float mass, TransformData translation, (Collider, Action<Matrix>? setTrans) userObj)
+    internal RigidBody Create(CollisionShape shape, bool dynamic, float mass, TransformData translation, (Collider, Action<Matrix>? setTrans) userObj, bool keepActive)
     {
         RigidBodyConstructionInfo bodyInfo = dynamic
             ? new RigidBodyConstructionInfo(mass, null, shape, shape.CalculateLocalInertia(mass))
@@ -42,6 +43,7 @@ public class Physics : GameObject
             bodyInfo.MotionState = new DefaultMotionState(translation.CreateSelectedModelMatrix(false).Convert());
         
         var body = new RigidBody(bodyInfo);
+        if (keepActive) body.ActivationState = ActivationState.DisableDeactivation;
         world.AddRigidBody(body);
         body.UserObject = userObj;
         bodyInfo.Dispose();

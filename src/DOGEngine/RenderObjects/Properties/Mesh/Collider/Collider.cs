@@ -1,11 +1,8 @@
 using BulletSharp;
 using BulletSharp.Math;
-using DOGEngine.RenderObjects.Properties.Mesh;
 using DOGEngine.Shader;
-using TriangleMesh = BulletSharp.TriangleMesh;
-using Vector3 = BulletSharp.Math.Vector3;
 
-namespace DOGEngine.RenderObjects.Properties;
+namespace DOGEngine.RenderObjects.Properties.Mesh.Collider;
 
 public enum PhysicsSimulationType
 {
@@ -33,19 +30,35 @@ public enum ColliderType
 public class Collider : GameObject, IPostInitializedGameObject, IDeletableGameObject
 {
     public PhysicsType PhysicsType { get; }
-    public Collider(string file, PhysicsType? physicsType = null, params IColliderWrapper[] colliders)
+    public Collider(string file, PhysicsType? physicsType = null, Transform? transform = null, bool stayActive = false, params IColliderWrapper[] colliders)
     {
-        colliderVertexData = Mesh.TriangleMesh.FromFile(file, true).Data[typeof(VertexShaderAttribute)];
+        ColliderVertexData = Properties.Mesh.TriangleMesh.FromFile(file, true).Data[typeof(VertexShaderAttribute)];
         PhysicsType = physicsType ?? PhysicsType.CreateNone();
         physicsColliders = colliders;
-
+        suppliedTransform = transform;
+        keepActive = stayActive;
     }
 
-    public Collider(PhysicsType? physicsType = null, params IColliderWrapper[] colliders) //use the mesh as the collider
+    public Collider(PhysicsType? physicsType = null,Transform? transform = null, bool stayActive = false, params IColliderWrapper[] colliders) //use the mesh as the collider
     {
-        colliderVertexData = null;
+        ColliderVertexData = null;
         PhysicsType = physicsType ?? PhysicsType.CreateNone();
         physicsColliders = colliders;
+        suppliedTransform = transform;
+        keepActive = stayActive;
+    }
+
+    private readonly Transform? suppliedTransform;
+
+    private Transform? _transform
+    {
+        get
+        {
+            if (suppliedTransform is not null) return suppliedTransform;
+            if (Parent.TryGetComponent(out Transform? transform1)) return transform1;
+            if (Parent is Properties.Mesh.Mesh mesh && mesh.Parent.TryGetComponent(out Transform? transform2)) return transform2;
+            return null;
+        }
     }
 
     internal CollisionObject? physicsObj;
@@ -64,12 +77,11 @@ public class Collider : GameObject, IPostInitializedGameObject, IDeletableGameOb
             physicsObj = null;
         }
 
-        Parent.Parent.TryGetComponent(out Transform? transform);
-        if (transform is not null)
+        if (_transform is not null)
         {
             try
             {
-                transform.TransformChanged -= updateColliderPosition;
+                _transform.TransformChanged -= updateColliderPosition;
             }
             catch
             {
@@ -77,6 +89,8 @@ public class Collider : GameObject, IPostInitializedGameObject, IDeletableGameOb
             }
         }
     }
+
+    private readonly bool keepActive;
     public void EnablePhysics()
     {
         if (physicsObj is not null) return;
@@ -86,34 +100,36 @@ public class Collider : GameObject, IPostInitializedGameObject, IDeletableGameOb
         {
             Parent.Parent.TryGetComponent(out Transform? transform);
             var scale = (transform?.TransformData ?? TransformData.Default).Scale;
-            if (physicsColliders.Length == 0)
-                return IColliderWrapper.Combine(scale, new MeshCollider(ColliderVertexData));
-            return IColliderWrapper.Combine(scale, physicsColliders);
+            return physicsColliders.Length == 0
+                ? ColliderVertexData is not null
+                    ? IColliderWrapper.Combine(scale, new MeshCollider(ColliderVertexData))
+                    : IColliderWrapper.Combine(scale)
+                : IColliderWrapper.Combine(scale, physicsColliders);
         }
         if (Root.TryGetComponent(out Physics.Physics? physics))
         {
             if (PhysicsType.Type == PhysicsSimulationType.Dynamic) 
             {
-                if (Parent.Parent.TryGetComponent(out Transform? transform))
+                if (_transform is not  null)
                 {
-                    physicsObj = physics!.Create(CreateCollider(), true, PhysicsType.Mass, transform!.TransformData,
-                        (this, matrix => SetTranslation(transform, matrix)));
-                    transform.TransformChanged += updateColliderPosition;
+                    physicsObj = physics!.Create(CreateCollider(), true, PhysicsType.Mass, _transform!.TransformData,
+                        (this, matrix => SetTranslation(_transform, matrix)), keepActive);
+                    _transform.TransformChanged += updateColliderPosition;
                 }
                 else
                     physicsObj = physics!.Create(CreateCollider(), true, PhysicsType.Mass, TransformData.Default,
-                        (this, null));
+                        (this, null), keepActive);
             }
             else if (PhysicsType.Type == PhysicsSimulationType.Static)
             {
-                if (Parent.Parent.TryGetComponent(out Transform? transform))
+                if (_transform is not null)
                 {
-                    physicsObj = physics!.Create(CreateCollider(), false, 0, transform!.TransformData, (this, null));
-                    transform.TransformChanged += updateColliderPosition;
+                    physicsObj = physics!.Create(CreateCollider(), false, 0, _transform!.TransformData, (this, null), keepActive);
+                    _transform.TransformChanged += updateColliderPosition;
                 }
                 else
                 {
-                    physicsObj = physics!.Create(CreateCollider(), false, 0, TransformData.Default, (this, null));
+                    physicsObj = physics!.Create(CreateCollider(), false, 0, TransformData.Default, (this, null), keepActive);
                 }
             }
         }
@@ -129,17 +145,13 @@ public class Collider : GameObject, IPostInitializedGameObject, IDeletableGameOb
         }
     }
 
-    private float[]? colliderVertexData;
     private readonly IColliderWrapper[] physicsColliders;
-    public float[] ColliderVertexData => colliderVertexData!;
+    public float[]? ColliderVertexData { get; private set; }
     public bool NotInitialized { get; set; } = true;
     public void InitFunc()
     {
-        if (colliderVertexData is null)
-        {
-            if (Parent is Mesh.Mesh mesh) colliderVertexData = mesh.MeshData.VertexData;
-            else throw new AggregateException("Parent must be mesh or vertex data must be supplied");
-        }
+        if (ColliderVertexData is null && Parent is Properties.Mesh.Mesh mesh)
+            ColliderVertexData = mesh.MeshData.VertexData;
         EnablePhysics();
     }
 

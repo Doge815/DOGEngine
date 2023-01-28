@@ -4,6 +4,7 @@ using DOGEngine.Physics;
 using DOGEngine.RenderObjects;
 using DOGEngine.RenderObjects.Properties;
 using DOGEngine.RenderObjects.Properties.Mesh;
+using DOGEngine.RenderObjects.Properties.Mesh.Collider;
 using DOGEngine.RenderObjects.Text;
 using DOGEngine.Shader;
 using DOGEngine.Texture;
@@ -13,7 +14,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 using Window = DOGEngine.Window;
 
 GameObjectCollection scene = new GameObjectCollection();
-PlayerController camera = new PlayerController(){Yaw = -90, Pitch = 1.53f, Position = new Vector3(0, 3, 0)};
+PhysicalPlayerController camera = new PhysicalPlayerController();
 int hitCounter = 0;
 bool focused = true;
 
@@ -38,6 +39,7 @@ void OnLoad(Window window)
     scene.AddComponent(new Physics());
     scene.AddComponent(new Skybox("Texture/Skybox"));
     scene.CollectionAddComponents(
+        camera,
         new(
             new Shading(shader1),
             new Mesh(TriangleMesh.Triangle),
@@ -66,7 +68,7 @@ void OnLoad(Window window)
         ),
         new(
             new Shading(shader1),
-            new Mesh(cubeMesh, new Collider(PhysicsType.CreatePassive(), new CubeCollider())),
+            new Mesh(cubeMesh, new Collider(PhysicsType.CreatePassive(), null, true, new CubeCollider())),
             new Transform(new Vector3(15, -3, 0), null, new Vector3(3,3,1)),
             new Name("pushingCube")
         ),
@@ -126,7 +128,7 @@ void OnLoad(Window window)
             {
                 GameObject cube = new (
                     new Shading(shader3),
-                    new Mesh(cubeMesh, new Collider(PhysicsType.CreateActive(1), new CubeCollider())),
+                    new Mesh(cubeMesh, new Collider(PhysicsType.CreateActive(1), null, false, new CubeCollider())),
                     new Transform(new Vector3(10 + x, 10 + y, -10 - z)),
                     new Name("physicsCube"));
                 scene.CollectionAddComponents(cube);
@@ -149,7 +151,7 @@ void OnUpdate(Window window, FrameEventArgs frameEventArgs)
         }
         if (window.MouseState.IsButtonReleased(MouseButton.Button1))
         {
-            var x = scene.CastRay(camera.Position, camera.Front);
+            var x = scene.CastRay(camera.Camera.Position, camera.Camera.Front);
             if (x is not null && x.Parent.Parent.TryGetComponent(out Name? name))
             {
                 if(name!.ObjName == "hitCube")
@@ -203,12 +205,12 @@ _ = new Window(800, 800, "TestApp",
         Window.BasicLoad();
         OnLoad(window);
     },
-    (_, frameEventArgs) => Window.BasicRender(scene, camera, frameEventArgs),
+    (_, frameEventArgs) => Window.BasicRender(scene, camera.Camera, frameEventArgs),
     (window, frameEventArgs) =>
     {
         Window.BasicUpdate(scene, window, frameEventArgs);
         OnUpdate(window, frameEventArgs);
     },
-    (_, resizeArgs) => Window.BasicResize(resizeArgs, camera)
+    (_, resizeArgs) => Window.BasicResize(resizeArgs, camera.Camera)
 
 );
