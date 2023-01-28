@@ -23,12 +23,17 @@ public class Physics : GameObject
         world.StepSimulation(time);
         foreach (var o in world.CollisionObjectArray)
         {
-            if (o is RigidBody { UserObject: Action<Matrix> action } collisionObject)
+            if (o is RigidBody { UserObject: (_,Action<Matrix> action) } collisionObject)
                 action(collisionObject.MotionState.WorldTransform);
         }
     }
 
-    internal void Create(CollisionShape shape, bool dynamic, float mass, TransformData translation, Action<Matrix>? setTrans)
+    internal void Remove(CollisionObject obj)
+    {
+        world.RemoveCollisionObject(obj);
+    }
+
+    internal RigidBody Create(CollisionShape shape, bool dynamic, float mass, TransformData translation, (Collider, Action<Matrix>? setTrans) userObj)
     {
         RigidBodyConstructionInfo bodyInfo = dynamic
             ? new RigidBodyConstructionInfo(mass, null, shape, shape.CalculateLocalInertia(mass))
@@ -38,7 +43,35 @@ public class Physics : GameObject
         
         var body = new RigidBody(bodyInfo);
         world.AddRigidBody(body);
-        body.UserObject = setTrans;
+        body.UserObject = userObj;
         bodyInfo.Dispose();
+        return body;
+    }
+
+    public IEnumerable<Collider> GetAllColliding(Collider collider)
+    {
+        if(collider.physicsObj is null) yield break;
+        HashSet<Collider> found = new () {collider};
+        int numManifolds = world.Dispatcher.NumManifolds;
+        for (int i = 0; i < numManifolds; i++)
+        {
+            PersistentManifold contactManifold = world.Dispatcher.GetManifoldByIndexInternal(i);
+
+            if (contactManifold.Body0 is RigidBody { UserObject: (Collider col1, _) } &&
+                contactManifold.Body1 is RigidBody { UserObject: (Collider col2, _) })
+            {
+                if (col1 == collider && !found.Contains(col2))
+                {
+                    found.Add(col2);
+                    yield return col2;
+                }
+
+                if (col2 == collider && !found.Contains(col1))
+                {
+                    found.Add(col1);
+                    yield return col1;
+                }
+            } 
+        }
     }
 }

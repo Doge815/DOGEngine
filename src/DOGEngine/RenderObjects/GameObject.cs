@@ -50,10 +50,7 @@ public class GameObject
 
     public void AddComponent(GameObject gameObject)
     {
-        if (!children.TryAdd(gameObject.GetType(), gameObject)) throw new ArgumentException("Can't add component");
-        gameObject.Parent = this;
-        gameObject.initializeChildren = initializeChildren;
-        if(initializeChildren && gameObject is IPostInitializedGameObject initialize) initialize.Initialize();
+        if (!TryAddComponent(gameObject)) throw new ArgumentException("Can't add game object");
     }
 
     public bool TryAddComponent(GameObject gameObject)
@@ -63,6 +60,26 @@ public class GameObject
         gameObject.initializeChildren = initializeChildren;
         if(initializeChildren && gameObject is IPostInitializedGameObject initialize) initialize.Initialize();
         return true;
+    }
+
+    public bool TryRemoveComponent(GameObject gameObject, bool delete = true)
+    {
+        if (!children.Keys.Contains(gameObject.GetType())) return false;
+        if(delete) gameObject.deleteWithChildren();
+        children.Remove(gameObject.GetType());
+        return true;
+    }
+
+    public void RemoveComponent(GameObject gameObject, bool delete = true)
+    {
+        if (!TryRemoveComponent(gameObject, delete)) throw new ArgumentException("Can't remove game object");
+    }
+
+    internal  virtual void deleteWithChildren()
+    {
+        foreach (var child in Children)
+            child.deleteWithChildren();
+        if (this is IDeletableGameObject delete) delete.Delete();
     }
 
     public GameObject Parent { get; internal set; }

@@ -30,7 +30,7 @@ public enum ColliderType
     Box,
     Mesh,
 }
-public class Collider : GameObject, IPostInitializedGameObject
+public class Collider : GameObject, IPostInitializedGameObject, IDeletableGameObject
 {
     public PhysicsType PhysicsType { get; }
     public Collider(string file, PhysicsType? physicsType = null, params IColliderWrapper[] colliders)
@@ -48,8 +48,25 @@ public class Collider : GameObject, IPostInitializedGameObject
         physicsColliders = colliders;
     }
 
-    private void addToPhysicsEngine()
+    internal CollisionObject? physicsObj;
+
+    public void DisablePhysics()
     {
+        if (physicsObj is not null && Root.TryGetComponent(out Physics.Physics? physics))
+        {
+            foreach (var collisions in physics!.GetAllColliding(this))
+                if (collisions.physicsObj is not null)
+                {
+                    collisions.physicsObj.Activate();
+                }
+            physics.Remove(physicsObj);
+            physicsObj.Dispose();
+            physicsObj = null;
+        }
+    }
+    public void EnablePhysics()
+    {
+        if (physicsObj is not null) return;
         void SetTranslation(Transform transform, Matrix translation) => transform.TransformData.SetModel(translation.Convert(), false, true, true);
 
         CollisionShape CreateCollider()
@@ -63,19 +80,9 @@ public class Collider : GameObject, IPostInitializedGameObject
         if (Root.TryGetComponent(out Physics.Physics? physics))
         {
             if (PhysicsType.Type == PhysicsSimulationType.Dynamic)
-            {
-                if(Parent.Parent.TryGetComponent(out Transform? transform)) 
-                    physics!.Create(CreateCollider(), true, PhysicsType.Mass, transform!.TransformData, matrix => SetTranslation(transform, matrix));
-                else
-                    physics!.Create(CreateCollider(), true, PhysicsType.Mass, TransformData.Default, null);
-            }
+                physicsObj = Parent.Parent.TryGetComponent(out Transform? transform) ? physics!.Create(CreateCollider(), true, PhysicsType.Mass, transform!.TransformData, (this, matrix => SetTranslation(transform, matrix))) : physics!.Create(CreateCollider(), true, PhysicsType.Mass, TransformData.Default, (this, null));
             else if (PhysicsType.Type == PhysicsSimulationType.Static)
-            {
-                if(Parent.Parent.TryGetComponent(out Transform? transform)) 
-                    physics!.Create(CreateCollider(), false, 0, transform!.TransformData, null);
-                else
-                    physics!.Create(CreateCollider(), false, 0, TransformData.Default, null);
-            }
+                physicsObj = physics!.Create(CreateCollider(), false, 0, Parent.Parent.TryGetComponent(out Transform? transform) ? transform!.TransformData : TransformData.Default, (this, null));
         }
     }
 
@@ -90,6 +97,12 @@ public class Collider : GameObject, IPostInitializedGameObject
             if (Parent is Mesh.Mesh mesh) colliderVertexData = mesh.MeshData.VertexData;
             else throw new AggregateException("Parent must be mesh or vertex data must be supplied");
         }
-        addToPhysicsEngine();
+        EnablePhysics();
+    }
+
+    public bool NotDeleted { get; set; } = true;
+    public void DeleteFunc()
+    {
+        DisablePhysics();
     }
 }

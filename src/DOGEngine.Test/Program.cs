@@ -13,7 +13,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 using Window = DOGEngine.Window;
 
 GameObjectCollection scene = new GameObjectCollection();
-PlayerController camera = new PlayerController(){Yaw = -90, Pitch = 1.53f};
+PlayerController camera = new PlayerController(){Yaw = -90, Pitch = 1.53f, Position = new Vector3(0, 3, 0)};
 int hitCounter = 0;
 bool focused = true;
 
@@ -62,7 +62,7 @@ void OnLoad(Window window)
         new(
             new Shading(shader2),
             new Mesh(cubeMesh, new Collider(PhysicsType.CreatePassive())),
-            new Transform(new Vector3(0, -10, 0), null, new Vector3(50, 1, 50))
+            new Transform(new Vector3(0, -5, 0), null, new Vector3(50, 1, 50))
         ),
         new(
             new Shading(shader1),
@@ -120,15 +120,16 @@ void OnLoad(Window window)
             {
                 GameObject cube = new (
                     new Shading(shader3),
-                    new Mesh(cubeMesh, new Collider(PhysicsType.CreateActive(1))),
-                    new Transform(new Vector3(10 + x, 20 + y, -10 - z)));
+                    new Mesh(cubeMesh, new Collider(PhysicsType.CreateActive(1), new CubeCollider())),
+                    new Transform(new Vector3(10 + x, 10 + y, -10 - z)),
+                    new Name("physicsCube"));
                 scene.CollectionAddComponents(cube);
             }
         }
     }
     
     scene.InitializeAll();
-    window.GrabCursor(true);
+    //window.GrabCursor(true);
 }
 
 void OnUpdate(Window window, FrameEventArgs frameEventArgs)
@@ -138,13 +139,20 @@ void OnUpdate(Window window, FrameEventArgs frameEventArgs)
         camera.Update(window.KeyboardState, window.MouseState, (float)frameEventArgs.Time);
         if (window.IsFocused)
         {
-            window.GrabCursor(true);
+            //window.GrabCursor(true);
         }
-        if (window.MouseState.IsButtonPressed(MouseButton.Button1))
+        if (window.MouseState.IsButtonReleased(MouseButton.Button1))
         {
             var x = scene.CastRay(camera.Position, camera.Front);
-            if (x is not null && x.Parent.Parent.TryGetComponent(out Name? name) && name!.ObjName == "hitCube")
-                hitCounter++;
+            if (x is not null && x.Parent.Parent.TryGetComponent(out Name? name))
+            {
+                if(name!.ObjName == "hitCube")
+                    hitCounter++;
+                else if (name.ObjName == "physicsCube")
+                {
+                    scene.CollectionRemoveComponents(true, x.Parent.Parent);
+                }
+            }
         }
     }
 
