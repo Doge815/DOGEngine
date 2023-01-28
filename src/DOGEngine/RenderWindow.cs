@@ -1,5 +1,6 @@
 using DOGEngine.RenderObjects;
 using DOGEngine.RenderObjects.Properties;
+using DOGEngine.RenderObjects.Properties.Mesh;
 using DOGEngine.RenderObjects.Text;
 using DOGEngine.Shader;
 
@@ -87,20 +88,21 @@ public class Window
         GL.Enable(EnableCap.DepthTest);
         GL.ClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     };
-    public static Action<Window> BasicUpdate { get; } = (window) =>
+    public static Action<GameObject, Window, FrameEventArgs> BasicUpdate { get; } = (scene, window, args) =>
     {
         if (window.KeyboardState.IsKeyDown(Keys.Escape))
             window.Close();
+        if (scene.TryGetComponent(out Physics.Physics? physics))
+            physics!.Update((float)args.Time);
     };
-    public static Action<GameObject, Camera.Camera> BasicRender { get; } = (scene, camera) =>
+    public static Action<GameObject, Camera.Camera, FrameEventArgs> BasicRender { get; } = (scene, camera, args) =>
     {
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         
         var view = camera.ViewMatrix;
         var projection = camera.ProjectionMatrix;
 
-        var skyBoxes = scene.GetAllInChildren<Skybox>().ToArray();
-        if(skyBoxes.Any()) skyBoxes.First().Draw(view, projection);
+        scene.GetAllInChildren<Skybox>().FirstOrDefault()?.Draw(view, projection);
 
         List<Lightning> lights = new List<Lightning>();
         foreach (Lightning light in scene.GetAllInChildren<Lightning>())

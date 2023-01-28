@@ -3,18 +3,6 @@ using DOGEngine.Texture;
 
 namespace DOGEngine.RenderObjects;
 
-public interface IPostInitializedGameObject
-{
-    protected bool NotInitialized { get; set; }
-
-    internal sealed void Initialize()
-    {
-        if (NotInitialized) InitFunc();
-        NotInitialized = false;
-    }
-
-    public void InitFunc();
-}
 public class GameObject
 {
     private readonly Dictionary<Type, GameObject> children;
@@ -41,11 +29,13 @@ public class GameObject
 
     public virtual IEnumerable<T> GetAllInChildren<T>() where T : GameObject
     {
+        if (this is T o) yield return o;
+        
         foreach (GameObject child in Children)
-        foreach (var childComponent in child.GetAllInChildren<T>())
-            yield return childComponent;
-
-        if (GetType() == typeof(T)) yield return this as T ?? throw new SystemException("Oof");
+        {
+            foreach (var childComponent in child.GetAllInChildren<T>())
+                yield return childComponent;
+        }
     }
 
     public virtual IEnumerable<GameObject> GetAllWithName(string name)
@@ -60,20 +50,53 @@ public class GameObject
 
     public void AddComponent(GameObject gameObject)
     {
-        if (!children.TryAdd(gameObject.GetType(), gameObject)) throw new ArgumentException("Can't add component");
-        gameObject.Parent = this;
-        if(gameObject is IPostInitializedGameObject initialize) initialize.Initialize();
+        if (!TryAddComponent(gameObject)) throw new ArgumentException("Can't add game object");
     }
 
     public bool TryAddComponent(GameObject gameObject)
     {
-        bool success = children.TryAdd(gameObject.GetType(), gameObject);
-        if(success && gameObject is IPostInitializedGameObject initialize) initialize.Initialize();
-        return success;
+        if (!children.TryAdd(gameObject.GetType(), gameObject)) return false;
+        gameObject.Parent = this;
+        gameObject.initializeChildren = initializeChildren;
+        if(initializeChildren && gameObject is IPostInitializedGameObject initialize) initialize.Initialize();
+        return true;
+    }
+
+    public bool TryRemoveComponent(GameObject gameObject, bool delete = true)
+    {
+        if (!children.Keys.Contains(gameObject.GetType())) return false;
+        if(delete) gameObject.deleteWithChildren();
+        children.Remove(gameObject.GetType());
+        return true;
+    }
+
+    public void RemoveComponent(GameObject gameObject, bool delete = true)
+    {
+        if (!TryRemoveComponent(gameObject, delete)) throw new ArgumentException("Can't remove game object");
+    }
+
+    internal  virtual void deleteWithChildren()
+    {
+        foreach (var child in Children)
+            child.deleteWithChildren();
+        if (this is IDeletableGameObject delete) delete.Delete();
     }
 
     public GameObject Parent { get; internal set; }
 
+    public GameObject Root => Parent == this ? this : Parent.Root;
+
+    internal bool initializeChildren { get; set; }
+
+    public void InitializeAll()
+    {
+        foreach (var obj in GetAllInChildren<GameObject>())
+        {
+            obj.initializeChildren = true;
+            if (obj is IPostInitializedGameObject initialize)
+                initialize.Initialize();
+        }
+    }
     public GameObject(params GameObject[] newChildren)
     {
         Parent = this;
@@ -82,11 +105,7 @@ public class GameObject
         {
             if (!children.TryAdd(child.GetType(), child)) throw new ArgumentException("Can't add component");
             child.Parent = this;
-        }
-        foreach (var child in newChildren)
-        {
-            if(child is IPostInitializedGameObject initialize)
-                initialize.Initialize();
+            child.initializeChildren = initializeChildren;
         }
     }
 }

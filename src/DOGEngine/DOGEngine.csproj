@@ -4,16 +4,19 @@
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="FreeTypeSharp" Version="2.0.0.12-ci" />
         <PackageReference Include="OpenTK" Version="4.7.5" />
         <PackageReference Include="StbImageSharp" Version="2.27.13" />
+        <PackageReference Include="PlayCity.BulletSharp" Version="1.1.0" />
     </ItemGroup>
     
     <ItemGroup>
         <Content Include="Shader\Shaders\**" CopyToOutputDirectory="Always" />
+        <Content Include="libbulletc.so" CopyToOutputDirectory="Always" />
     </ItemGroup>
 
 </Project>
