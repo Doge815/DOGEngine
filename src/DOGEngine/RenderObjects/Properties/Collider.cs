@@ -122,7 +122,11 @@ public class Collider : GameObject, IPostInitializedGameObject, IDeletableGameOb
     private void updateColliderPosition(TransformData data)
     {
         if (physicsObj is RigidBody rigidBody)
-            rigidBody.MotionState.WorldTransform = data.CreateSelectedModelMatrix(false).Convert();
+        {
+            ///Todo: This is a hack that implies that the center of mass is the center of the model
+            ///Create a kinematic object instead
+            rigidBody.CenterOfMassTransform = data.CreateSelectedModelMatrix(false).Convert();
+        }
     }
 
     private float[]? colliderVertexData;

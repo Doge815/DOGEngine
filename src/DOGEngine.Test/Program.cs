@@ -66,6 +66,12 @@ void OnLoad(Window window)
         ),
         new(
             new Shading(shader1),
+            new Mesh(cubeMesh, new Collider(PhysicsType.CreatePassive(), new CubeCollider())),
+            new Transform(new Vector3(15, -3, 0), null, new Vector3(3,3,1)),
+            new Name("pushingCube")
+        ),
+        new(
+            new Shading(shader1),
             new Mesh(cubeMesh),
             new Transform(new Vector3(-1, -1, -5)),
             new Name("hitCube")
@@ -129,7 +135,7 @@ void OnLoad(Window window)
     }
     
     scene.InitializeAll();
-    //window.GrabCursor(true);
+    window.GrabCursor(true);
 }
 
 void OnUpdate(Window window, FrameEventArgs frameEventArgs)
@@ -139,7 +145,7 @@ void OnUpdate(Window window, FrameEventArgs frameEventArgs)
         camera.Update(window.KeyboardState, window.MouseState, (float)frameEventArgs.Time);
         if (window.IsFocused)
         {
-            //window.GrabCursor(true);
+            window.GrabCursor(true);
         }
         if (window.MouseState.IsButtonReleased(MouseButton.Button1))
         {
@@ -168,37 +174,41 @@ void OnUpdate(Window window, FrameEventArgs frameEventArgs)
     }
 
 
-    if (scene.GetAllWithName("cube3").FirstOrDefault()?.TryGetComponent(out Transform? transform) is not null)
+    {if (scene.GetAllWithName("cube3").FirstOrDefault()?.TryGetComponent(out Transform? transform) is not null)
     {
         transform!.Orientation = transform.Orientation with
         {
             Y = (transform.Orientation.Y + 60 * (float)frameEventArgs.Time) % 360
         };
-        {
             if (scene.GetAllWithName("rotationText").FirstOrDefault()
                     ?.TryGetComponent(out RenderText? renderText) is not null)
                 renderText!.Text = $"Rotation: {transform.Orientation.Y:F0}°";
-        }
+    }}
+    { if (scene.GetAllWithName("pushingCube").FirstOrDefault()?.TryGetComponent(out Transform? transform) is not null)
+            transform!.Position = transform.Position with
+            {
+                Z = transform.Position.Z - (float)frameEventArgs.Time
+            };
     }
 
     {if (scene.GetAllWithName("fpsText").FirstOrDefault()?.TryGetComponent(out RenderText? renderText) is not null)
-            renderText!.Text = $"FPS: {1/frameEventArgs.Time:F2}";}
+        renderText!.Text = $"FPS: {1/frameEventArgs.Time:F2}";}
 
-        {if (scene.GetAllWithName("hitText").FirstOrDefault()?.TryGetComponent(out RenderText? renderText) is not null)
-            renderText!.Text = $"Cube hits: {hitCounter}";}
-    }
-    _ = new Window(800, 800, "TestApp",
-        (window) =>
-        {
-            Window.BasicLoad();
-            OnLoad(window);
-        },
-        (_, frameEventArgs) => Window.BasicRender(scene, camera, frameEventArgs),
-        (window, frameEventArgs) =>
-        {
-            Window.BasicUpdate(scene, window, frameEventArgs);
-            OnUpdate(window, frameEventArgs);
-        },
-        (_, resizeArgs) => Window.BasicResize(resizeArgs, camera)
+    {if (scene.GetAllWithName("hitText").FirstOrDefault()?.TryGetComponent(out RenderText? renderText) is not null)
+        renderText!.Text = $"Cube hits: {hitCounter}";}
+}
+_ = new Window(800, 800, "TestApp",
+    (window) =>
+    {
+        Window.BasicLoad();
+        OnLoad(window);
+    },
+    (_, frameEventArgs) => Window.BasicRender(scene, camera, frameEventArgs),
+    (window, frameEventArgs) =>
+    {
+        Window.BasicUpdate(scene, window, frameEventArgs);
+        OnUpdate(window, frameEventArgs);
+    },
+    (_, resizeArgs) => Window.BasicResize(resizeArgs, camera)
 
-    );
+);
