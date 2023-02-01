@@ -40,6 +40,6 @@ public static class Renderer
     public static void RenderSprites(this GameObjectCollection scene, int width, int height)
     {
         foreach (Sprite2D sprite2D in scene.GetAllInChildren<Sprite2D>())
-            sprite2D.Draw();
+            sprite2D.Draw(width, height);
     }
 }

@@ -23,6 +23,7 @@ void OnLoad(Window window)
     var wallTexture = new Texture("Texture/Textures/wall.jpg");
     var woodTexture = new Texture("Texture/Textures/wood.jpg");
     var carpetTexture = new Texture("Texture/Textures/carpet.jpg");
+    var crosshairTexture = new Texture("Texture/Textures/Crosshair.png");
     var metalTexture = new PbrTextureCollection("Texture/Textures/Metal");
 
     var shader1 = new TextureShader(wallTexture);
@@ -108,6 +109,8 @@ void OnLoad(Window window)
             new Transform(new Vector3(1, 1, -3))
         ),
         new (
+            new Sprite2D(crosshairTexture, new Vector2(-25, -25), new Vector2(50, 50), Corner.Center)),
+        new (
             new RenderText(font, "", new Vector2(100, -100), Corner.TopLeft, new Vector3(1, 1 ,0), 1),
             new Name("fpsText")),
         new (
@@ -119,7 +122,7 @@ void OnLoad(Window window)
         
     );
 
-    const int count = 10;
+    const int count = 5;
     for (int x = 0; x < count; x++)
     {
         for (int y = 0; y < count; y++)

@@ -88,7 +88,7 @@ public class Window
         GL.Enable(EnableCap.DepthTest);
         GL.ClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     };
-    public static Action<GameObjectCollection, Window, FrameEventArgs> BasicUpdate { get; } = (scene, window, args) =>
+    public static Action<GameObject, Window, FrameEventArgs> BasicUpdate { get; } = (scene, window, args) =>
     {
         if (window.KeyboardState.IsKeyDown(Keys.Escape))
             window.Close();
@@ -102,10 +102,10 @@ public class Window
         var view = camera.ViewMatrix;
         var projection = camera.ProjectionMatrix;
 
-        //scene.RenderSkybox(view, projection);
-        //scene.SetLights();
-        //scene.RenderMeshes(view, projection, camera.Position);
-        //scene.RenderText(camera.Width, camera.Height);
+        scene.RenderSkybox(view, projection);
+        scene.SetLights();
+        scene.RenderMeshes(view, projection, camera.Position);
+        scene.RenderText(camera.Width, camera.Height);
         scene.RenderSprites(camera.Width, camera.Height);
     };
     public static Action<ResizeEventArgs, Camera.Camera> BasicResize { get; } = (args, camera) =>

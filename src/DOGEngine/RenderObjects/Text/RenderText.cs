@@ -20,6 +20,20 @@ public class RenderText : GameObject
     public Vector2 Position { get; set; }
     public Corner RelativePosition { get; set; }
 
+    internal static (float x, float y) GetOffset(Corner corner, float width, float height) => corner switch
+    {
+        Corner.TopLeft => (0, height),
+        Corner.TopCenter => (width/2, height),
+        Corner.TopRight => (width, height),
+        Corner.CenterLeft => (0, height/2),
+        Corner.Center => (width/2, height/2),
+        Corner.CenterRight => (width, height/2),
+        Corner.BottomLeft => (0, 0),
+        Corner.BottomCenter => (width/2, 0),
+        Corner.BottomRight => (width, 0),
+        _ => throw new ArgumentOutOfRangeException(nameof(corner), corner, null)
+    };
+
     public RenderText(Font font, string? text = null, Vector2? position = null, Corner? relativePosition = null, Vector3? color = null,
         float? scale = null)
     {
@@ -47,13 +61,9 @@ public class RenderText : GameObject
             float w = ch.Size.X * Scale;
             float h = ch.Size.Y * Scale;
 
-            if (RelativePosition == Corner.TopLeft) y += height;
-            if (RelativePosition == Corner.BottomRight) x += width;
-            if (RelativePosition == Corner.TopRight)
-            {
-                y += height;
-                x += width;
-            }
+            (float offX, float offY) = GetOffset(RelativePosition, width, height);
+            x += offX;
+            y += offY;
             
             float[] pos = new float[] {
                 x, y + h, 0, 0,
@@ -66,18 +76,20 @@ public class RenderText : GameObject
             Shader.UseTextShader(ch);
             GL.BufferSubData(BufferTarget.ArrayBuffer, 0, sizeof(float)*pos.Length, pos);
             GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
+            
             offset += (int)(ch.Offset * Scale);
         }
     }
+
 }
 
 public enum Corner
 {
-    TopLeft,
-    BottomLeft,
-    TopRight,
-    BottomRight
+    TopLeft,    TopCenter,    TopRight,
+    CenterLeft, Center,       CenterRight,
+    BottomLeft, BottomCenter, BottomRight
 }
+
 
 internal static class RenderCharacterProvider
 {
