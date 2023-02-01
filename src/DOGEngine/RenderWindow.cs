@@ -125,6 +125,10 @@ public class Window
         {
             text.Draw(camera.Width, camera.Height);
         }
+        foreach (Sprite2D sprite2D in scene.GetAllInChildren<Sprite2D>())
+        {
+            sprite2D.Draw(camera.Width, camera.Height);
+        }
     };
     public static Action<ResizeEventArgs, Camera.Camera> BasicResize { get; } = (args, camera) =>
     {
