@@ -81,10 +81,10 @@ public class CapsuleCollider : IColliderWrapper
 public class MeshCollider : IColliderWrapper
 {
     public Matrix4? Transform { get; }
-    private readonly float[] verices;
+    private readonly float[] vertices;
     public MeshCollider(float[] vertexData, Vector3? position = null, Vector3? orientation = null)
     {
-        verices = vertexData;
+        vertices = vertexData;
         if (position is not null || orientation is not null)
         {
             Transform = Matrix4.Identity;
@@ -98,12 +98,12 @@ public class MeshCollider : IColliderWrapper
     }
     public CollisionShape GetShape(Vector3 scale) {
         var mesh = new BulletSharp.TriangleMesh();
-        for (int i = 0; i < verices.Length; i+=9)
+        for (int i = 0; i < vertices.Length; i+=9)
         {
             mesh.AddTriangle(
-                new BulletSharp.Math.Vector3(verices[i+0],verices[i+1],verices[i+2]) * scale.Convert(),
-                new BulletSharp.Math.Vector3(verices[i+3],verices[i+4],verices[i+5]) * scale.Convert(),
-                new BulletSharp.Math.Vector3(verices[i+6],verices[i+7],verices[i+8]) * scale.Convert()
+                new BulletSharp.Math.Vector3(vertices[i+0],vertices[i+1],vertices[i+2]) * scale.Convert(),
+                new BulletSharp.Math.Vector3(vertices[i+3],vertices[i+4],vertices[i+5]) * scale.Convert(),
+                new BulletSharp.Math.Vector3(vertices[i+6],vertices[i+7],vertices[i+8]) * scale.Convert()
             );
         }
 

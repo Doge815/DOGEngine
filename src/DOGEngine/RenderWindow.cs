@@ -88,43 +88,25 @@ public class Window
         GL.Enable(EnableCap.DepthTest);
         GL.ClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     };
-    public static Action<GameObject, Window, FrameEventArgs> BasicUpdate { get; } = (scene, window, args) =>
+    public static Action<GameObjectCollection, Window, FrameEventArgs> BasicUpdate { get; } = (scene, window, args) =>
     {
         if (window.KeyboardState.IsKeyDown(Keys.Escape))
             window.Close();
         if (scene.TryGetComponent(out Physics.Physics? physics))
             physics!.Update((float)args.Time);
     };
-    public static Action<GameObject, Camera.Camera, FrameEventArgs> BasicRender { get; } = (scene, camera, args) =>
+    public static Action<GameObjectCollection, Camera.Camera, FrameEventArgs> BasicRender { get; } = (scene, camera, args) =>
     {
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         
         var view = camera.ViewMatrix;
         var projection = camera.ProjectionMatrix;
 
-        scene.GetAllInChildren<Skybox>().FirstOrDefault()?.Draw(view, projection);
-
-        List<Lightning> lights = new List<Lightning>();
-        foreach (Lightning light in scene.GetAllInChildren<Lightning>())
-            lights.Add(light);
-        
-        foreach (Shading shading in scene.GetAllInChildren<Shading>())
-        {
-            if(shading.Shader is PbrShader pbrShader)
-                foreach ((Lightning item, int index) in lights.WithIndex())
-                {
-                    pbrShader.SetVector3($"lightPositions[{index}]", item.GetPosition);
-                    pbrShader.SetVector3($"lightColors[{index}]", item.GetColor);
-                }
-        }
-            
-        foreach (Mesh mesh in scene.GetAllInChildren<Mesh>())
-            mesh.Draw(view, projection, camera.Position);
-
-        foreach (RenderText text in scene.GetAllInChildren<RenderText>())
-        {
-            text.Draw(camera.Width, camera.Height);
-        }
+        //scene.RenderSkybox(view, projection);
+        //scene.SetLights();
+        //scene.RenderMeshes(view, projection, camera.Position);
+        //scene.RenderText(camera.Width, camera.Height);
+        scene.RenderSprites(camera.Width, camera.Height);
     };
     public static Action<ResizeEventArgs, Camera.Camera> BasicResize { get; } = (args, camera) =>
     {
