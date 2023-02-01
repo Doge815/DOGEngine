@@ -7,6 +7,7 @@ using DOGEngine.RenderObjects.Properties.Mesh;
 using DOGEngine.RenderObjects.Properties.Mesh.Collider;
 using DOGEngine.RenderObjects.Text;
 using DOGEngine.Shader;
+using DOGEngine.Test.Scripts;
 using DOGEngine.Texture;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
@@ -15,7 +16,6 @@ using Window = DOGEngine.Window;
 
 GameObjectCollection scene = new GameObjectCollection();
 PhysicalPlayerController camera = new PhysicalPlayerController();
-int hitCounter = 0;
 bool focused = true;
 
 void OnLoad(Window window)
@@ -40,6 +40,8 @@ void OnLoad(Window window)
     scene.AddComponent(new Physics());
     scene.AddComponent(new Skybox("Texture/Skybox"));
     scene.CollectionAddComponents(
+        new CubeClickedScript(),
+        new FpsScript(),
         camera,
         new(
             new Shading(shader1),
@@ -71,7 +73,7 @@ void OnLoad(Window window)
             new Shading(shader1),
             new Mesh(cubeMesh, new Collider(PhysicsType.CreatePassive(), null, true, new CubeCollider())),
             new Transform(new Vector3(15, -3, 0), null, new Vector3(3,3,1)),
-            new Name("pushingCube")
+            new PushingCubeScript()
         ),
         new(
             new Shading(shader1),
@@ -96,7 +98,7 @@ void OnLoad(Window window)
             new Mesh(cubeMesh),
             new Transform(new Vector3(0, 4, -5), new Vector3(0, 1, 0), new Vector3(2, 3, 4),
                 new Vector3(1, 0, 1)),
-            new Name("cube3")
+            new RotatingCubeScript()
         ),
         new(
             new Shading(shader2),
@@ -139,7 +141,6 @@ void OnLoad(Window window)
         }
     }
     
-    scene.InitializeAll();
     window.GrabCursor(true);
 }
 
@@ -151,19 +152,6 @@ void OnUpdate(Window window, FrameEventArgs frameEventArgs)
         if (window.IsFocused)
         {
             window.GrabCursor(true);
-        }
-        if (window.MouseState.IsButtonReleased(MouseButton.Button1))
-        {
-            var x = scene.CastRay(camera.Camera.Position, camera.Camera.Front);
-            if (x is not null && x.Parent.Parent.TryGetComponent(out Name? name))
-            {
-                if(name!.ObjName == "hitCube")
-                    hitCounter++;
-                else if (name.ObjName == "physicsCube")
-                {
-                    scene.CollectionRemoveComponents(true, x.Parent.Parent);
-                }
-            }
         }
     }
 
@@ -177,30 +165,6 @@ void OnUpdate(Window window, FrameEventArgs frameEventArgs)
         focused = false;
         window.GrabCursor(false);
     }
-
-
-    {if (scene.GetAllWithName("cube3").FirstOrDefault()?.TryGetComponent(out Transform? transform) is not null)
-    {
-        transform!.Orientation = transform.Orientation with
-        {
-            Y = (transform.Orientation.Y + 60 * (float)frameEventArgs.Time) % 360
-        };
-            if (scene.GetAllWithName("rotationText").FirstOrDefault()
-                    ?.TryGetComponent(out RenderText? renderText) is not null)
-                renderText!.Text = $"Rotation: {transform.Orientation.Y:F0}°";
-    }}
-    { if (scene.GetAllWithName("pushingCube").FirstOrDefault()?.TryGetComponent(out Transform? transform) is not null)
-            transform!.Position = transform.Position with
-            {
-                Z = transform.Position.Z - (float)frameEventArgs.Time
-            };
-    }
-
-    {if (scene.GetAllWithName("fpsText").FirstOrDefault()?.TryGetComponent(out RenderText? renderText) is not null)
-        renderText!.Text = $"FPS: {1/frameEventArgs.Time:F2}";}
-
-    {if (scene.GetAllWithName("hitText").FirstOrDefault()?.TryGetComponent(out RenderText? renderText) is not null)
-        renderText!.Text = $"Cube hits: {hitCounter}";}
 }
 _ = new Window(800, 800, "TestApp",
     (window) =>
@@ -211,7 +175,7 @@ _ = new Window(800, 800, "TestApp",
     (_, frameEventArgs) => Window.BasicRender(scene, camera.Camera, frameEventArgs),
     (window, frameEventArgs) =>
     {
-        Window.BasicUpdate(scene, window, frameEventArgs);
+        Window.BasicUpdate(scene, camera.Camera, window, frameEventArgs);
         OnUpdate(window, frameEventArgs);
     },
     (_, resizeArgs) => Window.BasicResize(resizeArgs, camera.Camera)

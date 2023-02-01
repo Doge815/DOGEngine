@@ -88,12 +88,20 @@ public class Window
         GL.Enable(EnableCap.DepthTest);
         GL.ClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     };
-    public static Action<GameObject, Window, FrameEventArgs> BasicUpdate { get; } = (scene, window, args) =>
+    public static Action<GameObjectCollection, Camera.Camera, Window, FrameEventArgs> BasicUpdate { get; } = (scene, camera, window, args) =>
     {
         if (window.KeyboardState.IsKeyDown(Keys.Escape))
             window.Close();
         if (scene.TryGetComponent(out Physics.Physics? physics))
             physics!.Update((float)args.Time);
+        Script.KeyboardState = window.KeyboardState;
+        Script.MouseState = window.MouseState;
+        Script.Scene = scene;
+        Script.deltaTime = args.Time;
+        Script.MainCamera = camera;
+        if(!scene.initializeChildren) scene.InitializeAll();
+        foreach (Script script in scene.GetAllInChildren<Script>().ToArray())
+            script.Update();
     };
     public static Action<GameObjectCollection, Camera.Camera, FrameEventArgs> BasicRender { get; } = (scene, camera, args) =>
     {
