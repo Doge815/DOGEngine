@@ -7,7 +7,8 @@ public class RotatingCubeScript : Script
 {
     private Transform? cubeTransform;
     private RenderText? rotationText;
-    public override void Start()
+
+    protected override void Start()
     {
         Parent.TryGetComponent(out cubeTransform);
         Scene.GetAllWithName("rotationText").FirstOrDefault()?.TryGetComponent(out rotationText);

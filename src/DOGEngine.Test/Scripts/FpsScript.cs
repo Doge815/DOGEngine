@@ -7,7 +7,7 @@ public class FpsScript : Script
 {
     private RenderText? FPS;
 
-    public override void Start() => Scene.GetAllWithName("fpsText").FirstOrDefault()?.TryGetComponent(out FPS);
+    protected override void Start() => Scene.GetAllWithName("fpsText").FirstOrDefault()?.TryGetComponent(out FPS);
 
     public override void Update()
     {

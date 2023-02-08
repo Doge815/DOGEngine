@@ -9,7 +9,8 @@ public class CubeClickedScript : Script
 {
     private int hitCounter = 0;
     private RenderText? hitCounterText;
-    public override void Start()
+
+    protected override void Start()
     {
         Scene.GetAllWithName("hitText").FirstOrDefault()?.TryGetComponent(out hitCounterText);
     }
@@ -18,7 +19,7 @@ public class CubeClickedScript : Script
     {
         if (MouseState.IsButtonReleased(MouseButton.Button1))
         {
-            var x = Scene.CastRay(MainCamera.Position, MainCamera.Front);
+            var x = Scene.CastRay(Camera.Position, Camera.Front);
             if (x is not null && x.Parent.Parent.TryGetComponent(out Name? name))
             {
                 if(name!.ObjName == "hitCube")

@@ -88,38 +88,48 @@ public class Window
         GL.Enable(EnableCap.DepthTest);
         GL.ClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     };
-    public static Action<GameObjectCollection, Camera.Camera, Window, FrameEventArgs> BasicUpdate { get; } = (scene, camera, window, args) =>
+    public static Action<IEnumerable<(GameObjectCollection, Camera.Camera)>, Window, FrameEventArgs> BasicUpdate { get; } = (sceneCameraPairs, window, args) =>
     {
         if (window.KeyboardState.IsKeyDown(Keys.Escape))
             window.Close();
-        if (scene.TryGetComponent(out Physics.Physics? physics))
-            physics!.Update((float)args.Time);
         Script.KeyboardState = window.KeyboardState;
         Script.MouseState = window.MouseState;
-        Script.Scene = scene;
         Script.deltaTime = args.Time;
-        Script.MainCamera = camera;
-        if(!scene.initializeChildren) scene.InitializeAll();
-        foreach (Script script in scene.GetAllInChildren<Script>().ToArray())
-            script.Update();
+        foreach (var pair in sceneCameraPairs)
+        {
+            Script.Scene = pair.Item1;
+            Script.Camera = pair.Item2;
+            if (pair.Item1.TryGetComponent(out Physics.Physics? physics))
+                physics!.Update((float)args.Time);
+            if (!pair.Item1.initializeChildren) pair.Item1.InitializeAll();
+            foreach (var script in pair.Item1.GetAllInChildren<Script>().ToArray())
+                script.Update();
+        }
     };
-    public static Action<GameObjectCollection, Camera.Camera, FrameEventArgs> BasicRender { get; } = (scene, camera, args) =>
+    public static Action<IEnumerable<(GameObjectCollection, Camera.Camera)>, FrameEventArgs> BasicRender { get; } = (SceneCameraPairs, args) =>
     {
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-        
-        var view = camera.ViewMatrix;
-        var projection = camera.ProjectionMatrix;
 
-        scene.RenderSkybox(view, projection);
-        scene.SetLights();
-        scene.RenderMeshes(view, projection, camera.Position);
-        scene.RenderText(camera.Width, camera.Height);
-        scene.RenderSprites(camera.Width, camera.Height);
+        foreach (var pair in SceneCameraPairs)
+        {
+            var view = pair.Item2.ViewMatrix;
+            var projection = pair.Item2.ProjectionMatrix;
+
+            pair.Item1.RenderSkybox(view, projection);
+            pair.Item1.SetLights();
+            pair.Item1.RenderMeshes(view, projection, pair.Item2.Position);
+            pair.Item1.RenderText(pair.Item2.Width, pair.Item2.Height);
+            pair.Item1.RenderSprites(pair.Item2.Width, pair.Item2.Height);
+            GL.Clear(ClearBufferMask.DepthBufferBit);
+        }
     };
-    public static Action<ResizeEventArgs, Camera.Camera> BasicResize { get; } = (args, camera) =>
+    public static Action<ResizeEventArgs, IEnumerable<Camera.Camera>> BasicResize { get; } = (args, cameras) =>
     {
         GL.Viewport(0,0,args.Width, args.Height);
-        camera.Width = args.Width;
-        camera.Height = args.Height;
+        foreach (Camera.Camera camera in cameras)
+        {
+            camera.Width = args.Width;
+            camera.Height = args.Height;
+        }
     };
 }

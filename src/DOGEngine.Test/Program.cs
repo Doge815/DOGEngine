@@ -14,8 +14,10 @@ using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using Window = DOGEngine.Window;
 
-GameObjectCollection scene = new GameObjectCollection();
-PhysicalPlayerController camera = new PhysicalPlayerController();
+GameObjectCollection scene3D = new GameObjectCollection();
+PhysicalPlayerController camera3D = new PhysicalPlayerController();
+GameObjectCollection sceneFPS = new GameObjectCollection();
+Camera cameraFPS = new Camera();
 bool focused = true;
 
 void OnLoad(Window window)
@@ -39,12 +41,13 @@ void OnLoad(Window window)
 
     var font = new Font(Font.DejaVuSans, 50);
 
-    scene.AddComponent(new Physics());
-    scene.AddComponent(new Skybox("Texture/Skybox"));
-    scene.CollectionAddComponents(
+    scene3D.AddComponent(new Physics());
+    scene3D.CollectionAddComponents(
+        new Physics(),
+        new Skybox("Texture/Skybox"),
         new CubeClickedScript(),
         new FpsScript(),
-        camera,
+        camera3D,
         new(
             new Shading(shader1),
             new Mesh(TriangleMesh.Triangle),
@@ -145,10 +148,18 @@ void OnLoad(Window window)
                     new Mesh(cubeMesh, new Collider(PhysicsType.CreateActive(1), null, false, new CubeCollider())),
                     new Transform(new Vector3(10 + x, 10 + y, -10 - z)),
                     new Name("physicsCube"));
-                scene.CollectionAddComponents(cube);
+                scene3D.CollectionAddComponents(cube);
             }
         }
     }
+
+    sceneFPS = new GameObjectCollection();
+    sceneFPS.CollectionAddComponents(
+        new GameObject(
+            new Shading(shader1),
+            new Mesh(cubeMesh),
+            new Transform(new Vector3(4, -2, 2))
+        ));
     
     window.GrabCursor(true);
 }
@@ -157,7 +168,7 @@ void OnUpdate(Window window, FrameEventArgs frameEventArgs)
 {
     if (focused)
     {
-        camera.Update(window.KeyboardState, window.MouseState, (float)frameEventArgs.Time);
+        camera3D.Update(window.KeyboardState, window.MouseState, (float)frameEventArgs.Time);
         if (window.IsFocused)
         {
             window.GrabCursor(true);
@@ -181,12 +192,12 @@ _ = new Window(800, 800, "TestApp",
         Window.BasicLoad();
         OnLoad(window);
     },
-    (_, frameEventArgs) => Window.BasicRender(scene, camera.Camera, frameEventArgs),
+    (_, frameEventArgs) => Window.BasicRender(new []{(scene3D, camera3D.Camera),(sceneFPS, cameraFPS)}, frameEventArgs),
     (window, frameEventArgs) =>
     {
-        Window.BasicUpdate(scene, camera.Camera, window, frameEventArgs);
+        Window.BasicUpdate(new []{(scene3D, camera3D.Camera), (sceneFPS, cameraFPS)}, window, frameEventArgs);
         OnUpdate(window, frameEventArgs);
     },
-    (_, resizeArgs) => Window.BasicResize(resizeArgs, camera.Camera)
+    (_, resizeArgs) => Window.BasicResize(resizeArgs, new []{camera3D.Camera, cameraFPS})
 
 );

@@ -5,7 +5,7 @@ namespace DOGEngine.Test.Scripts;
 public class PushingCubeScript : Script
 {
     private Transform? cubeTransform;
-    public override void Start() => Parent.TryGetComponent(out cubeTransform);
+    protected override void Start() => Parent.TryGetComponent(out cubeTransform);
     public override void Update()
     {
         if(cubeTransform is not  null)

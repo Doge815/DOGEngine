@@ -10,7 +10,8 @@ public class FlickeringLightScript : Script
     private bool on;
     private double switchAfter;
     private double current;
-    public override void Start()
+
+    protected override void Start()
     {
         Parent.TryGetComponent(out light);
     }
