@@ -16,11 +16,13 @@ uniform vec3 lightColors[128];
 
 uniform vec3 camPos;
 
+uniform vec2 scale;
+
 const float PI = 3.14159265359;
 
 vec3 getNormalFromMap()
 {
-    vec3 tangentNormal = texture(normalMap, coord).xyz * 2.0 - 1.0;
+    vec3 tangentNormal = texture(normalMap, coord * scale).xyz * 2.0 - 1.0;
 
     vec3 Q1  = dFdx(WorldPos);
     vec3 Q2  = dFdy(WorldPos);
@@ -77,10 +79,10 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 
 void main()
 {		
-    vec3 albedo     = pow(texture(albedoMap, coord).rgb, vec3(2.2));
-    float metallic  = texture(metallicMap, coord).r;
-    float roughness = texture(roughnessMap, coord).r;
-    float ao        = texture(aoMap, coord).r;
+    vec3 albedo     = pow(texture(albedoMap, coord * scale).rgb, vec3(2.2));
+    float metallic  = texture(metallicMap, coord * scale).r;
+    float roughness = texture(roughnessMap, coord * scale).r;
+    float ao        = texture(aoMap, coord * scale).r;
 
     vec3 N = getNormalFromMap();
     vec3 V = normalize(camPos - WorldPos);

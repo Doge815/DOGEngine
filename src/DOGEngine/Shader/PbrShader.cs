@@ -2,9 +2,9 @@ using DOGEngine.Texture;
 
 namespace DOGEngine.Shader;
 
-public class PbrShader : Shader, IVertexShader, INormalShader, ITextureCoordShader, IModelShader, IViewShader, IProjectionShader, ICameraPosShader
+public class PbrShader : Shader, IVertexShader, INormalShader, ITextureCoordShader, IModelShader, IViewShader, IProjectionShader, ICameraPosShader, ITextureScaleShader
 {
-    public PbrShader(PbrTextureCollection texture) : base("Shader/Shaders/PbrShader.vert",
+    public PbrShader(PbrTextureCollection texture, Vector2? scale = null) : base("Shader/Shaders/PbrShader.vert",
         "Shader/Shaders/PbrShader.frag")
     {
         Texture = texture;
@@ -13,6 +13,7 @@ public class PbrShader : Shader, IVertexShader, INormalShader, ITextureCoordShad
         SetInt("metallicMap", 2);
         SetInt("roughnessMap", 3);
         SetInt("aoMap", 4);
+        Scale = scale ?? Vector2.One;
     }
     public ITexture Texture { get; }
     public static VertexShaderAttribute Vertex { get; } = new(0, "aPosition");
@@ -24,6 +25,17 @@ public class PbrShader : Shader, IVertexShader, INormalShader, ITextureCoordShad
     {
         base.Use();
         Texture.Use();
+    }
+    private Vector2 _scale;
+
+    public Vector2 Scale
+    {
+        get => _scale;
+        set
+        {
+            _scale = value;
+            SetVector2("scale", _scale);
+        }
     }
     
     public void SetModel(Matrix4 model) => SetMatrix4("model", model);

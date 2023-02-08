@@ -89,6 +89,11 @@ public abstract class Shader : IShader
         GL.UniformMatrix4(getUniformPos(name), true, ref data);
     }
 
+    public void SetVector2(string name, Vector2 data)
+    {
+        GL.UseProgram(Handle);
+        GL.Uniform2(getUniformPos(name), data);
+    }
     public void SetVector3(string name, Vector3 data)
     {
         GL.UseProgram(Handle);
@@ -193,4 +198,9 @@ public interface IProjectionShader
 public interface ICameraPosShader
 {
     public void SetCameraPos(Vector3 cameraPos);
+}
+
+public interface ITextureScaleShader
+{
+    public Vector2 Scale { get; set; }
 }

@@ -32,6 +32,8 @@ void OnLoad(Window window)
     var shader4 = new PlainColorShader(new Vector3(1, 1, 1));
     var shader5 = new PlainColorShader(new Vector3(0.8f, 0.2f, 0.2f));
     var shader6 = new PbrShader(metalTexture);
+    var shader7 = new TextureShader(woodTexture, new Vector2(50f, 50f));
+    var shader8 = new PbrShader(metalTexture, new Vector2(10,10));
 
     var cubeMesh = new TriangleMesh(TriangleMesh.Cube);
 
@@ -65,7 +67,7 @@ void OnLoad(Window window)
             new Transform(new Vector3(-7, 13, -3.5f) )
         ),
         new(
-            new Shading(shader2),
+            new Shading(shader7),
             new Mesh(cubeMesh, new Collider(PhysicsType.CreatePassive())),
             new Transform(new Vector3(0, -5, 0), null, new Vector3(50, 1, 50))
         ),
@@ -78,7 +80,7 @@ void OnLoad(Window window)
         new(
             new Shading(shader1),
             new Mesh(cubeMesh),
-            new Transform(new Vector3(-1, -1, -5)),
+            new Transform(new Vector3(-5, -1, -5)),
             new Name("hitCube")
         ),
         new(
@@ -91,7 +93,8 @@ void OnLoad(Window window)
             new Shading(shader5),
             new Mesh(cubeMesh),
             new Transform(new Vector3(10, 1, 1)),
-            new Lightning()
+            new Lightning(),
+            new FlickeringLightScript()
         ),
         new(
             new Shading(shader3),
@@ -109,6 +112,12 @@ void OnLoad(Window window)
             new Shading(shader6),
             new Mesh(TriangleMesh.FromFile("Models/Sphere"), new Collider("Models/SphereLowPoly")),
             new Transform(new Vector3(1, 1, -3))
+        ),
+        new(
+            new Shading(shader8),
+            new Mesh(TriangleMesh.FromFile("Models/Cube")),
+            new Transform(new Vector3(1, -2, -5f), null, new Vector3(2,2,2)),
+            new RotatingCubeScript()
         ),
         new (
             new Sprite2D(crosshairTexture, new Vector2(-25, -25), new Vector2(50, 50), Corner.Center)),
