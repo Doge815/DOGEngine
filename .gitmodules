@@ -1,0 +1,3 @@
+[submodule "src/PainAndSuffering"]
+	path = src/PainAndSuffering
+	url = https://github.com/Doge815/PainAndSuffering.git
