@@ -17,5 +17,8 @@
     <ItemGroup>
         <Content Include="Models\**" CopyToOutputDirectory="Always" />
     </ItemGroup>
+    <ItemGroup>
+        <Content Include="Sounds\**" CopyToOutputDirectory="Always" />
+    </ItemGroup>
 
 </Project>

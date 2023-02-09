@@ -104,6 +104,8 @@ public class Window
             if (!pair.Item1.initializeChildren) pair.Item1.InitializeAll();
             foreach (var script in pair.Item1.GetAllInChildren<Script>().ToArray())
                 script.Update();
+            foreach (var audio in pair.Item1.GetAllInChildren<AudioSource>())
+                audio.UpdateDirections(pair.Item2.Position);
         }
     };
     public static Action<IEnumerable<(GameObjectCollection, Camera.Camera)>, FrameEventArgs> BasicRender { get; } = (SceneCameraPairs, args) =>

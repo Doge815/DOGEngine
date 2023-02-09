@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <PackageReference Include="FreeTypeSharp" Version="2.0.0.12-ci" />
+        <PackageReference Include="NetCoreAudio" Version="1.7.0" />
         <PackageReference Include="OpenTK" Version="4.7.5" />
         <PackageReference Include="StbImageSharp" Version="2.27.13" />
         <PackageReference Include="PlayCity.BulletSharp" Version="1.1.0" />

@@ -7,6 +7,7 @@ public class FlickeringLightScript : Script
 {
     private static readonly Random random = new Random();
     private Lightning? light;
+    private AudioSource? audio;
     private bool on;
     private double switchAfter;
     private double current;
@@ -14,6 +15,7 @@ public class FlickeringLightScript : Script
     protected override void Start()
     {
         Parent.TryGetComponent(out light);
+        Parent.TryGetComponent(out audio);
     }
 
     public override void Update()
@@ -32,6 +34,8 @@ public class FlickeringLightScript : Script
                 else
                     light.Color = Vector3.Zero;
             }
+            if(audio is not null)
+                audio.Play();
         }
     }
 }

@@ -36,6 +36,8 @@ void OnLoad(Window window)
     var shader6 = new PbrShader(metalTexture);
     var shader7 = new TextureShader(woodTexture, new Vector2(50f, 50f));
     var shader8 = new PbrShader(metalTexture, new Vector2(10,10));
+    
+    var ding = new AudioFile("Sounds/ding.mp3");
 
     var cubeMesh = new TriangleMesh(TriangleMesh.Cube);
 
@@ -97,7 +99,8 @@ void OnLoad(Window window)
             new Mesh(cubeMesh),
             new Transform(new Vector3(10, 1, 1)),
             new Lightning(),
-            new FlickeringLightScript()
+            new FlickeringLightScript(),
+            new AudioSource(ding)
         ),
         new(
             new Shading(shader3),
