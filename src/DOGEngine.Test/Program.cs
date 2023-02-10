@@ -1,17 +1,18 @@
 ﻿using DOGEngine;
 using DOGEngine.Camera;
+using DOGEngine.GameObjects;
+using DOGEngine.GameObjects.Properties;
+using DOGEngine.GameObjects.Properties.Mesh;
+using DOGEngine.GameObjects.Properties.Mesh.Collider;
+using DOGEngine.GameObjects.Text;
 using DOGEngine.Physics;
-using DOGEngine.RenderObjects;
-using DOGEngine.RenderObjects.Properties;
-using DOGEngine.RenderObjects.Properties.Mesh;
-using DOGEngine.RenderObjects.Properties.Mesh.Collider;
-using DOGEngine.RenderObjects.Text;
 using DOGEngine.Shader;
 using DOGEngine.Test.Scripts;
 using DOGEngine.Texture;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using TriangleMesh = DOGEngine.GameObjects.Properties.Mesh.TriangleMesh;
 using Window = DOGEngine.Window;
 
 GameObjectCollection scene3D = new GameObjectCollection();

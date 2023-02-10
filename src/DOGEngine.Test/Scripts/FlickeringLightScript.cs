@@ -1,4 +1,5 @@
-using DOGEngine.RenderObjects.Properties;
+using DOGEngine.GameObjects.Properties;
+using DOGEngine.GameObjects.Properties;
 using OpenTK.Mathematics;
 
 namespace DOGEngine.Test.Scripts;

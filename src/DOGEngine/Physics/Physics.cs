@@ -1,8 +1,10 @@
 using BulletSharp;
 using BulletSharp.Math;
-using DOGEngine.RenderObjects;
-using DOGEngine.RenderObjects.Properties;
-using DOGEngine.RenderObjects.Properties.Mesh.Collider;
+using DOGEngine.GameObjects;
+using DOGEngine.GameObjects.Properties;
+using DOGEngine.GameObjects.Properties.Mesh.Collider;
+using DOGEngine.GameObjects;
+using DOGEngine.GameObjects.Properties;
 using Vector3 = BulletSharp.Math.Vector3;
 
 namespace DOGEngine.Physics;

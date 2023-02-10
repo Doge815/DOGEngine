@@ -1,5 +1,8 @@
+using DOGEngine.GameObjects;
+using DOGEngine.GameObjects.Properties;
 using NetCoreAudio;
-namespace DOGEngine.RenderObjects.Properties;
+
+namespace DOGEngine.GameObjects.Properties;
 
 public class AudioSource : GameObject
 {

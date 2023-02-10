@@ -1,7 +1,7 @@
 using DOGEngine.Shader;
 using StbImageSharp;
 
-namespace DOGEngine.RenderObjects;
+namespace DOGEngine.GameObjects;
 
 public class Skybox : GameObject //Todo: Split
 {

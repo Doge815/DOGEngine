@@ -3,7 +3,7 @@ using DOGEngine.Texture;
 using FreeTypeSharp.Native;
 using static FreeTypeSharp.Native.FT;
 
-namespace DOGEngine.RenderObjects.Text;
+namespace DOGEngine.GameObjects.Text;
 
 public class RenderText : GameObject
 {

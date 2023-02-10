@@ -1,4 +1,4 @@
-namespace DOGEngine.RenderObjects;
+namespace DOGEngine.GameObjects;
 
 public interface IDeletableGameObject
 {

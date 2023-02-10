@@ -1,13 +1,14 @@
+using DOGEngine.GameObjects.Properties;
 using DOGEngine.Physics;
-using DOGEngine.RenderObjects.Properties;
-using DOGEngine.RenderObjects.Text;
+using DOGEngine.GameObjects.Properties;
+using DOGEngine.GameObjects.Text;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace DOGEngine.Test.Scripts;
 
 public class CubeClickedScript : Script
 {
-    private int hitCounter = 0;
+    private int hitCounter;
     private RenderText? hitCounterText;
 
     protected override void Start()

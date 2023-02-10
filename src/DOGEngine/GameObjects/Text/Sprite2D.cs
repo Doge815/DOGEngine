@@ -1,7 +1,7 @@
 using DOGEngine.Shader;
 using DOGEngine.Texture;
 
-namespace DOGEngine.RenderObjects.Text;
+namespace DOGEngine.GameObjects.Text;
 
 public class Sprite2D : GameObject
 {

@@ -1,5 +1,6 @@
-using DOGEngine.RenderObjects.Properties;
-using DOGEngine.RenderObjects.Text;
+using DOGEngine.GameObjects.Properties;
+using DOGEngine.GameObjects.Text;
+using DOGEngine.GameObjects.Properties;
 
 namespace DOGEngine.Test.Scripts;
 

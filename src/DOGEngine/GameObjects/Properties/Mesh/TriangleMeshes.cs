@@ -1,6 +1,7 @@
+using DOGEngine.GameObjects;
 using DOGEngine.Shader;
 
-namespace DOGEngine.RenderObjects.Properties.Mesh;
+namespace DOGEngine.GameObjects.Properties.Mesh;
 
 public partial class TriangleMesh
 {

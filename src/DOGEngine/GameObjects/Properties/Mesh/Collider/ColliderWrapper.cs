@@ -1,6 +1,6 @@
 using BulletSharp;
 
-namespace DOGEngine.RenderObjects.Properties.Mesh.Collider;
+namespace DOGEngine.GameObjects.Properties.Mesh.Collider;
 
 public interface IColliderWrapper
 {

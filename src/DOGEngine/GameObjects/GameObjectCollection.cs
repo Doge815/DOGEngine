@@ -1,4 +1,6 @@
-namespace DOGEngine.RenderObjects;
+using DOGEngine.GameObjects;
+
+namespace DOGEngine.GameObjects;
 
 public class GameObjectCollection : GameObject
 {

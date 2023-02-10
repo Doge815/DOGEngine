@@ -1,6 +1,6 @@
 using DOGEngine.Shader;
 
-namespace DOGEngine.RenderObjects;
+namespace DOGEngine.GameObjects;
 
 public readonly struct VertexDataBundle
 {

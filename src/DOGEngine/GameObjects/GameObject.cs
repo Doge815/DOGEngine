@@ -1,7 +1,7 @@
-using DOGEngine.RenderObjects.Properties;
-using DOGEngine.Texture;
+using DOGEngine.GameObjects.Properties;
+using DOGEngine.GameObjects;
 
-namespace DOGEngine.RenderObjects;
+namespace DOGEngine.GameObjects;
 
 public class GameObject
 {

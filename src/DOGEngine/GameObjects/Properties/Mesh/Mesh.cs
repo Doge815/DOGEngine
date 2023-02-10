@@ -1,6 +1,9 @@
+using DOGEngine.GameObjects;
+using DOGEngine.GameObjects.Properties;
+using DOGEngine.GameObjects.Properties.Mesh;
 using DOGEngine.Shader;
 
-namespace DOGEngine.RenderObjects.Properties.Mesh;
+namespace DOGEngine.GameObjects.Properties.Mesh;
 
 public class Mesh : GameObject, IPostInitializedGameObject
 {

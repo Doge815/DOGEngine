@@ -1,4 +1,6 @@
-namespace DOGEngine.RenderObjects.Properties;
+using DOGEngine.GameObjects;
+
+namespace DOGEngine.GameObjects.Properties;
 
 public abstract class Script : GameObject, IPostInitializedGameObject
 {

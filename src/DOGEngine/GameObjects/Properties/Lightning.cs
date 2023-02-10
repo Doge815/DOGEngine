@@ -1,6 +1,8 @@
+using DOGEngine.GameObjects;
+using DOGEngine.GameObjects.Properties;
 using DOGEngine.Shader;
 
-namespace DOGEngine.RenderObjects.Properties;
+namespace DOGEngine.GameObjects.Properties;
 
 public class Lightning : GameObject
 {

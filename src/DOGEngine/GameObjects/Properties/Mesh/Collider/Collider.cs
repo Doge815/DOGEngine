@@ -2,7 +2,7 @@ using BulletSharp;
 using BulletSharp.Math;
 using DOGEngine.Shader;
 
-namespace DOGEngine.RenderObjects.Properties.Mesh.Collider;
+namespace DOGEngine.GameObjects.Properties.Mesh.Collider;
 
 public enum PhysicsSimulationType
 {
@@ -32,7 +32,7 @@ public class Collider : GameObject, IPostInitializedGameObject, IDeletableGameOb
     public PhysicsType PhysicsType { get; }
     public Collider(string file, PhysicsType? physicsType = null, Transform? transform = null, bool stayActive = false, params IColliderWrapper[] colliders)
     {
-        ColliderVertexData = Properties.Mesh.TriangleMesh.FromFile(file, true).Data[typeof(VertexShaderAttribute)];
+        ColliderVertexData = TriangleMesh.FromFile(file, true).Data[typeof(VertexShaderAttribute)];
         PhysicsType = physicsType ?? PhysicsType.CreateNone();
         physicsColliders = colliders;
         suppliedTransform = transform;
@@ -56,7 +56,7 @@ public class Collider : GameObject, IPostInitializedGameObject, IDeletableGameOb
         {
             if (suppliedTransform is not null) return suppliedTransform;
             if (Parent.TryGetComponent(out Transform? transform1)) return transform1;
-            if (Parent is Properties.Mesh.Mesh mesh && mesh.Parent.TryGetComponent(out Transform? transform2)) return transform2;
+            if (Parent is Mesh mesh && mesh.Parent.TryGetComponent(out Transform? transform2)) return transform2;
             return null;
         }
     }
@@ -150,7 +150,7 @@ public class Collider : GameObject, IPostInitializedGameObject, IDeletableGameOb
     public bool NotInitialized { get; set; } = true;
     public void InitFunc()
     {
-        if (ColliderVertexData is null && Parent is Properties.Mesh.Mesh mesh)
+        if (ColliderVertexData is null && Parent is Mesh mesh)
             ColliderVertexData = mesh.MeshData.VertexData;
         EnablePhysics();
     }

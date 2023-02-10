@@ -1,4 +1,4 @@
-namespace DOGEngine.RenderObjects.Text;
+namespace DOGEngine.GameObjects.Text;
 
 public struct Font
 {
