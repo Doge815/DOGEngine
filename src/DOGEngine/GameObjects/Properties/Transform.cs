@@ -10,6 +10,7 @@ internal struct TransformData
     private Vector3 _orientation;
     private Vector3 _scale;
     private Vector3 _orientationOffset;
+    private Matrix4 _animation;
     private Matrix4 _model;
 
     public Vector3 Position
@@ -43,6 +44,13 @@ internal struct TransformData
             modelUpdate = true;
         }
     }
+    public Matrix4 Animation 
+    {
+        get => _animation;
+        set { _animation = value;
+            modelUpdate = true;
+        }
+    }
 
     public Matrix4 Model
     {
@@ -60,6 +68,7 @@ internal struct TransformData
             _scale = _model.ExtractScale();
             _orientation = _model.ExtractRotation().ToEulerAngles() * 180f/MathF.PI;
             _orientationOffset = Vector3.Zero;
+            _animation = Matrix4.Identity;
         }
     }
 
@@ -77,29 +86,33 @@ internal struct TransformData
         
     }
     
-    public Matrix4 CreateModelMatrix() => CreateModelMatrix(Scale, OrientationOffset, Orientation, Position);
+    public Matrix4 CreateModelMatrix() => CreateModelMatrix(Scale, OrientationOffset, Orientation, Position, Animation);
 
-    public Matrix4 CreateSelectedModelMatrix(bool scale = true, bool orientationOffset = true, bool orientation = true, bool position = true) =>
+    public Matrix4 CreateSelectedModelMatrix(bool scale = true, bool orientationOffset = true, bool orientation = true, bool position = true, bool animation = true) =>
         CreateModelMatrix(
             scale ? Scale : Vector3.One,
             orientationOffset ? OrientationOffset : Vector3.Zero,
             orientation ? Orientation : Vector3.Zero,
-            position ? Position : Vector3.Zero
+            position ? Position : Vector3.Zero,
+            animation ? Animation : Matrix4.Identity
         );
-    public static Matrix4 CreateModelMatrix(Vector3 Scale, Vector3 OrientationOffset, Vector3 Orientation, Vector3 Position) =>
+    public static Matrix4 CreateModelMatrix(Vector3 Scale, Vector3 OrientationOffset, Vector3 Orientation, Vector3 Position, Matrix4 Animation) =>
         Matrix4.CreateScale(Scale)
         * Matrix4.CreateTranslation(OrientationOffset)
         * Matrix4.CreateFromQuaternion(new Quaternion(Orientation * MathF.PI/180f))
         * Matrix4.CreateTranslation(-OrientationOffset)
-        * Matrix4.CreateTranslation(Position);
+        * Matrix4.CreateTranslation(Position)
+        * Animation;
 
     public TransformData(Vector3? position = null, Vector3? orientation = null, Vector3? scale = null,
-        Vector3? orientationOffset = null)
+        Vector3? orientationOffset = null, Matrix4? animation = null)
     {
-        Position = position ?? Vector3.Zero;
-        Orientation = orientation ?? Vector3.Zero;
-        Scale = scale ?? Vector3.One;
-        OrientationOffset = orientationOffset ?? Vector3.Zero;
+        _position = position ?? Vector3.Zero;
+        _orientation = orientation ?? Vector3.Zero;
+        _scale = scale ?? Vector3.One;
+        _orientationOffset = orientationOffset ?? Vector3.Zero;
+        _animation = animation ?? Matrix4.Identity;
+        
         _model = CreateModelMatrix();   
         modelUpdate = false;
     }
@@ -131,6 +144,12 @@ public class Transform : GameObject
         set { TransformData.OrientationOffset = value; TransformChanged?.Invoke(this.TransformData); }
     }
 
+    public Matrix4 Animation
+    {
+        get => TransformData.Animation;
+        set { TransformData.Animation = value; TransformChanged?.Invoke(this.TransformData); }
+    }
+    
     public Matrix4 Model
     {
         get => TransformData.Model;
@@ -142,9 +161,9 @@ public class Transform : GameObject
     internal event TransformChangedHandler? TransformChanged;
     
     public Transform(Vector3? position = null, Vector3? orientation = null, Vector3? scale = null,
-        Vector3? orientationOffset = null)
+        Vector3? orientationOffset = null, Matrix4? animation = null)
     {
-        TransformData = new TransformData(position, orientation, scale, orientationOffset);
+        TransformData = new TransformData(position, orientation, scale, orientationOffset, animation);
     }
 
 }
