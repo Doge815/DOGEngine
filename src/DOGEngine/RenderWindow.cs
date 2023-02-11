@@ -107,6 +107,8 @@ public class Window
                 script.Update();
             foreach (var audio in pair.Item1.GetAllInChildren<AudioSource>())
                 audio.UpdateDirections(pair.Item2.Position);
+            foreach (var animation in pair.Item1.GetAllInChildren<AnimationController>())
+                animation.UpdateTransform(args.Time);
         }
     };
     public static Action<IEnumerable<(GameObjectCollection, Camera.Camera)>, FrameEventArgs> BasicRender { get; } = (SceneCameraPairs, args) =>

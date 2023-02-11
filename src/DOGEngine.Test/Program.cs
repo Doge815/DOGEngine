@@ -162,7 +162,9 @@ void OnLoad(Window window)
         new GameObject(
             new Shading(shader1),
             new Mesh(cubeMesh),
-            new Transform(new Vector3(4, -2, 2))
+            new Transform(new Vector3(4, -2, 2)),
+            new AnimationController(),
+            new FpsGunScript()
         ));
     
     window.GrabCursor(true);

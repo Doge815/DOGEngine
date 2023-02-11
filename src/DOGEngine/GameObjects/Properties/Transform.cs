@@ -2,7 +2,7 @@ using DOGEngine.GameObjects;
 
 namespace DOGEngine.GameObjects.Properties;
 
-internal struct TransformData
+public struct TransformData
 {
     public static TransformData Default { get; } = new (null);
     private bool modelUpdate;
@@ -44,7 +44,7 @@ internal struct TransformData
             modelUpdate = true;
         }
     }
-    public Matrix4 Animation 
+    internal Matrix4 Animation 
     {
         get => _animation;
         set { _animation = value;
@@ -97,12 +97,12 @@ internal struct TransformData
             animation ? Animation : Matrix4.Identity
         );
     public static Matrix4 CreateModelMatrix(Vector3 Scale, Vector3 OrientationOffset, Vector3 Orientation, Vector3 Position, Matrix4 Animation) =>
-        Matrix4.CreateScale(Scale)
+        Animation
+        * Matrix4.CreateScale(Scale)
         * Matrix4.CreateTranslation(OrientationOffset)
         * Matrix4.CreateFromQuaternion(new Quaternion(Orientation * MathF.PI/180f))
         * Matrix4.CreateTranslation(-OrientationOffset)
-        * Matrix4.CreateTranslation(Position)
-        * Animation;
+        * Matrix4.CreateTranslation(Position);
 
     public TransformData(Vector3? position = null, Vector3? orientation = null, Vector3? scale = null,
         Vector3? orientationOffset = null, Matrix4? animation = null)
@@ -147,7 +147,7 @@ public class Transform : GameObject
     public Matrix4 Animation
     {
         get => TransformData.Animation;
-        set { TransformData.Animation = value; TransformChanged?.Invoke(this.TransformData); }
+        internal set { TransformData.Animation = value; TransformChanged?.Invoke(this.TransformData); }
     }
     
     public Matrix4 Model
