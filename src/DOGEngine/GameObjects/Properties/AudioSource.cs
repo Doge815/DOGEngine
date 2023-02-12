@@ -34,14 +34,13 @@ public class AudioSource : GameObject
             distance = Vector3.Distance(position, transform!.Position);
 
         //float volume = MathF.Min(MathF.Max((100 - MathF.Pow(distance, 3) / 100), 0), 100);
-        float volume = MathF.Min(MathF.Max((MathF.Pow(distance, -2)* 1000), 0), 100);
+        //float volume = MathF.Min(MathF.Max((MathF.Pow(distance, -2)* 1000), 0), 100);
+        float volume = MathF.Min(MathF.Max(100 - MathF.Pow(distance/3, 2), 0), 100);
 
         currentPlayers = currentPlayers.Where(x => x.Playing).ToList();
 
-        foreach (Player player in currentPlayers)
-        {
-            player.SetVolume((byte)volume);
-        }
+        //Todo: this audio library is slow, this is a temporary fix (IT'S NOT)
+        Parallel.ForEach(currentPlayers, player => player.SetVolume((byte)volume));
     }
 }
 
