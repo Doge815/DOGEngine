@@ -8,16 +8,16 @@ public class Skybox : GameObject //Todo: Split
     private readonly int textureHandle;
     private readonly int cubeHandle;
     private readonly Shader.Shader shader;
-    public Skybox(string directory)
+    public Skybox(string directory, string extension = "jpg")
     {
         textureHandle = GetCubeMap(new []
         {
-            directory + "/right.jpg",
-            directory + "/left.jpg",
-            directory + "/top.jpg",
-            directory + "/bottom.jpg",
-            directory + "/front.jpg",
-            directory + "/back.jpg",
+            directory + $"/right.{extension}",
+            directory + $"/left.{extension}",
+            directory + $"/top.{extension}",
+            directory + $"/bottom.{extension}",
+            directory + $"/front.{extension}",
+            directory + $"/back.{extension}",
         });
         shader = new CubeMapShader();
         cubeHandle = GetSkyBoxCube();
