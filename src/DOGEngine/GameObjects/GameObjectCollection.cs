@@ -7,7 +7,7 @@ public class GameObjectCollection : GameObject
     private readonly List<GameObject> collection;
     public IReadOnlyCollection<GameObject> Collection => collection.AsReadOnly();
 
-    public GameObjectCollection()
+    public GameObjectCollection(params GameObject[] children) : base(children)
     {
         collection = new List<GameObject>();
     }
@@ -23,8 +23,16 @@ public class GameObjectCollection : GameObject
 
         if (initializeChildren)
             foreach (var child in children)
+            {
                 if (child is IPostInitializedGameObject initialize)
                     initialize.Initialize();
+                if(child is GameObjectCollection col)
+                    foreach (var go in col.GetAllInChildren<GameObject>())
+                    {
+                        if(go is IPostInitializedGameObject ini)
+                            ini.Initialize();
+                    }
+            }
     }
 
     public void CollectionRemoveComponents(bool delete = true, params GameObject[] children)
