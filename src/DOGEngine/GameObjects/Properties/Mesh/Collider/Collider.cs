@@ -38,6 +38,14 @@ public class Collider : GameObject, IPostInitializedGameObject, IDeletableGameOb
         suppliedTransform = transform;
         keepActive = stayActive;
     }
+    public Collider(TriangleMesh mesh, PhysicsType? physicsType = null, Transform? transform = null, bool stayActive = false, params IColliderWrapper[] colliders)
+    {
+        ColliderVertexData = mesh.tempData.Data[typeof(VertexShaderAttribute)];
+        PhysicsType = physicsType ?? PhysicsType.CreateNone();
+        physicsColliders = colliders;
+        suppliedTransform = transform;
+        keepActive = stayActive;
+    }
 
     public Collider(PhysicsType? physicsType = null,Transform? transform = null, bool stayActive = false, params IColliderWrapper[] colliders) //use the mesh as the collider
     {

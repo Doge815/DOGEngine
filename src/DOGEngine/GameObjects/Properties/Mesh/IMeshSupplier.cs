@@ -15,7 +15,7 @@ public partial class TriangleMesh : IMeshSupplier //simple mesh stored in a VAO 
 {
     private int VAO; 
     private int triangles;
-    private readonly VertexDataBundle tempData;
+    internal readonly VertexDataBundle tempData;
     public bool Initialized { get; private set; }
     
     public TriangleMesh(VertexDataBundle data)

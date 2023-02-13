@@ -23,16 +23,9 @@ public class GameObjectCollection : GameObject
 
         if (initializeChildren)
             foreach (var child in children)
-            {
-                if (child is IPostInitializedGameObject initialize)
-                    initialize.Initialize();
-                if(child is GameObjectCollection col)
-                    foreach (var go in col.GetAllInChildren<GameObject>())
-                    {
-                        if(go is IPostInitializedGameObject ini)
-                            ini.Initialize();
-                    }
-            }
+                foreach (var go in child.GetAllInChildren<GameObject>())
+                    if(go is IPostInitializedGameObject initialize)
+                        initialize.Initialize();
     }
 
     public void CollectionRemoveComponents(bool delete = true, params GameObject[] children)
