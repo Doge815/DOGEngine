@@ -31,6 +31,7 @@ public class Mesh : GameObject, IPostInitializedGameObject
     {
         MeshData = new TriangleMesh(data);
     }
+    public bool Hidden { get; set; }
 
     public bool NotInitialized { get; set; } = true;
 
@@ -44,6 +45,7 @@ public class Mesh : GameObject, IPostInitializedGameObject
 
     public void Draw(Matrix4 view, Matrix4 projection, Vector3 cameraPosition)
     {
+        if(Hidden) return;
         if (!MeshData.Initialized) return;
         Shader.Shader shader = Parent.GetComponent<Shading>().Shader;
         shader.Use();
