@@ -24,11 +24,11 @@ public class Physics : GameObject
     public void Update(float time)
     {
         world.StepSimulation(time);
-        foreach (var o in world.CollisionObjectArray)
-        {
+        Parallel.ForEach(world.CollisionObjectArray, o =>
+        { 
             if (o is RigidBody { UserObject: (_,Action<Matrix> action) } collisionObject)
                 action(collisionObject.MotionState.WorldTransform);
-        }
+        });
     }
 
     internal void Remove(CollisionObject obj)
